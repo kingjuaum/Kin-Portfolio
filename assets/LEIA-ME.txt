@@ -1,0 +1,32 @@
+IMAGENS QUE FALTAM NESTA PASTA
+==============================
+Exporte cada item do Figma e salve aqui com o nome indicado.
+No Figma: clique na camada (pelo ID, use Ctrl/Cmd+F e cole o ID, ou ache pelo nome),
+abra "Export" no painel da direita, escolha PNG (use 2x) e clique em Export.
+Para o rabisco do hero, exporte em SVG.
+
+arquivo               camada no Figma (ID)
+-------------------   ---------------------------------------------------------
+logo-kin.png          4:17     carinha do logo no topo
+kin-face.png          12:280   mesma carinha (grande no fundo azul e na faixa vermelha)
+                               -> pode ser o mesmo arquivo do logo-kin.png
+hero-mascot.png       4:123    "sem fundo 1" (boneco grande da Home)
+hero-scribble.svg     4:107    "Vector" do hero da Home (exportar como SVG)
+hero-chip.png         4:98     imagem pequena ao lado do rabisco, na Home
+hero-grid.png         4:130    fundo quadriculado do hero da Home ("Grid 2 1")
+bliss.png             12:174   fundo "windows_xp" do hero das subpáginas
+video-icon.png        12:283   icone azul de player de vídeo
+folder-icon.png       12:346   icone de pasta (página Outros)
+topography.png        12:185   textura de linhas do rodapé e da seção Trabalhos
+crown.png             12:268   coroinha amarela dos títulos
+instagram.png         12:186
+mail.png              12:188   (camada "50e7c79d...")
+discord.png           12:187   (camada "disc")
+footer-left.png       12:190   "sem fundo 2" (personagem sorrindo, esquerda do rodapé)
+footer-right.png      12:189   "sem fundo 4" (personagem com joinha, direita do rodapé)
+ae-icon.png           4:221    icone do After Effects (faixa de ferramentas da Home)
+premiere-icon.png     4:231    icone do Premiere
+photoshop-icon.png    4:237    icone do Photoshop
+portrait.png          7:6      foto/arte da seção "Sobre mim"
+
+Se quiser usar outro nome ou formato (jpg, webp), é só trocar o caminho no HTML/CSS.
