@@ -28,7 +28,7 @@ const EN = {
   works: 'Works', long_label: 'Long Videos', short_label: 'Short Videos',
   title_long: 'Long Videos', title_short: 'Short Videos', title_other: 'Other Works',
   about: 'About me',
-  about_text: "Hi, I'm João Vitor! I'm a video editor and motion designer who also lives the content-creation side of things. I work with tools like Premiere, After Effects and Photoshop to create high-impact visuals. Because I write and make my own videos for the web, I've developed a sharp eye for the rhythm and aesthetics of audiovisual work. My goal is always to deliver dynamic edits that mix solid technique with the fast language the internet demands!",
+  about_text: "Hi, I'm João Vitor! I'm a <strong>video editor</strong> and <strong>motion designer</strong> who also lives the content-creation side of things. I work with tools like <strong>Premiere, After Effects and Photoshop</strong> to create <strong>high-impact visuals</strong>. Because I write and make my own videos for the web, I've developed a sharp eye for the <strong>rhythm and aesthetics</strong> of audiovisual work. My goal is always to deliver <strong>dynamic edits</strong> that mix solid technique with the fast language the internet demands!",
   contacts: 'My Contacts',
   hero_t1: 'Video Editor &', hero_t2: 'Motion Designer',
   hero_sub: 'Dynamic edits, with technique and the fast language the internet demands.',
@@ -42,8 +42,10 @@ function store(k, v) { try { if (v === undefined) return localStorage.getItem(k)
 
 function setLang(lang) {
   $$('[data-i18n]').forEach(el => {
-    if (el.dataset.pt === undefined) el.dataset.pt = el.textContent;
-    el.textContent = lang === 'en' ? (EN[el.dataset.i18n] || el.dataset.pt) : el.dataset.pt;
+    const isHtml = el.hasAttribute('data-html');   // textos com <strong> precisam de innerHTML
+    if (el.dataset.pt === undefined) el.dataset.pt = isHtml ? el.innerHTML : el.textContent;
+    const txt = lang === 'en' ? (EN[el.dataset.i18n] || el.dataset.pt) : el.dataset.pt;
+    if (isHtml) el.innerHTML = txt; else el.textContent = txt;
   });
   $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
   document.documentElement.lang = lang === 'en' ? 'en' : 'pt-BR';
@@ -279,7 +281,7 @@ function initGrid() {
         if (mouse.p > 0.01) {
           const mx = bx - mouse.sx, my = by - mouse.sy, d2 = mx * mx + my * my;
           const f = Math.exp(-d2 / R2) * mouse.p, d = Math.sqrt(d2) + 0.001;
-          dx += (mx / d) * f * 28; dy += (my / d) * f * 28; a += f * 0.95;
+          dx += (mx / d) * f * 18; dy += (my / d) * f * 18; a += f * 0.5;
         }
         // ondas ao clicar
         for (let k = 0; k < ripples.length; k++) {
@@ -318,10 +320,11 @@ function initGrid() {
     }
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     for (let k = 0; k < NB; k++) {
-      const al = 0.1 + k * 0.75 / (NB - 1);
+      // opacidade baixa (0.04 a 0.17) para a grade ficar de fundo e não competir com o texto
+      const al = 0.04 + k * 0.13 / (NB - 1);
       ctx.lineWidth = (2.2 + k * 0.22) * u;
-      ctx.strokeStyle = 'rgba(1,1,1,' + al.toFixed(3) + ')'; ctx.stroke(lines[k]);
-      ctx.fillStyle = 'rgba(1,1,1,' + Math.min(0.92, al + 0.05).toFixed(3) + ')'; ctx.fill(dots[k]);
+      ctx.strokeStyle = 'rgba(43,40,47,' + al.toFixed(3) + ')'; ctx.stroke(lines[k]);
+      ctx.fillStyle = 'rgba(43,40,47,' + Math.min(0.22, al + 0.03).toFixed(3) + ')'; ctx.fill(dots[k]);
     }
     // esmaece a grade na borda de baixo (sem máscara CSS, que é pesada)
     ctx.globalCompositeOperation = 'destination-out';
@@ -389,30 +392,6 @@ function initGrid() {
   if (REDUCE) draw(0);
 }
 
-/* ---------- Cursor em anel (só com mouse) ---------- */
-function initCursor() {
-  if (REDUCE || !FINE_POINTER) return;
-  const ring = document.createElement('div');
-  ring.className = 'cursor-ring'; ring.setAttribute('aria-hidden', 'true');
-  document.body.appendChild(ring);
-  let x = -100, y = -100, tx = -100, ty = -100, raf = 0;
-  const tick = () => {
-    x += (tx - x) * 0.2; y += (ty - y) * 0.2;
-    ring.style.transform = 'translate3d(' + (x - 17) + 'px,' + (y - 17) + 'px,0)';
-    raf = (Math.abs(tx - x) > 0.1 || Math.abs(ty - y) > 0.1) ? requestAnimationFrame(tick) : 0;
-  };
-  window.addEventListener('pointermove', e => {
-    if (e.pointerType !== 'mouse') return;
-    tx = e.clientX; ty = e.clientY; ring.classList.add('on');
-    const hot = e.target.closest && e.target.closest('a, button, .video-card, .hero-icon, .hero-figure, .footer-mascot');
-    ring.classList.toggle('hot', !!hot);
-    if (!raf) raf = requestAnimationFrame(tick);
-  }, { passive: true });
-  document.addEventListener('pointerleave', () => ring.classList.remove('on'));
-  window.addEventListener('pointerdown', () => ring.classList.add('down'));
-  window.addEventListener('pointerup', () => ring.classList.remove('down'));
-}
-
 /* ---------- Cartões de vídeo: inclinação 3D com brilho ---------- */
 function initTilt() {
   if (REDUCE || !FINE_POINTER) return;
@@ -427,23 +406,6 @@ function initTilt() {
     });
     card.addEventListener('pointerleave', () => { card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg'); });
   });
-}
-
-/* ---------- Rolagem: faixas aceleram e fundos têm parallax ---------- */
-function initScrollFx() {
-  if (REDUCE) return;
-  const anims = $$('.marquee-track').map(t => t.getAnimations && t.getAnimations()[0]).filter(Boolean);
-  let last = window.scrollY, vel = 0, raf = 0;
-  const step = () => {
-    const y = window.scrollY, dy = y - last; last = y;
-    vel += (dy - vel) * 0.12;
-    const rate = 1 + Math.min(Math.abs(vel) * 0.3, 5);
-    anims.forEach(a => { a.playbackRate = rate; });
-    raf = (Math.abs(vel) > 0.02 || Math.abs(dy) > 0) ? requestAnimationFrame(step) : 0;
-    if (!raf) anims.forEach(a => { a.playbackRate = 1; });
-  };
-  window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(step); }, { passive: true });
-  step();
 }
 
 /* =====================================================================
@@ -657,6 +619,44 @@ function initWaves() {
   if (foot) make(foot, { color: 'rgba(255,255,255,0.16)', color2: 'rgba(255,255,255,0.10)', seed: 7.9 });
 }
 
+/* ---------- Fundo das subpáginas: cabeças do Kin flutuando (sem interação) ----------
+   Só imagens com animação de CSS (rodam na placa de vídeo). Posições fixas (sempre iguais),
+   nada de JS por quadro, e o movimento pausa quando a seção sai da tela. */
+function initHeadsBg() {
+  $$('main').forEach(host => {
+    const layer = document.createElement('div');
+    layer.className = 'bg-heads'; layer.setAttribute('aria-hidden', 'true');
+    host.prepend(layer);
+    let lastH = 0, timer = 0;
+    const build = () => {
+      const h = host.getBoundingClientRect().height;
+      if (lastH && Math.abs(h - lastH) / lastH < 0.25) return;
+      lastH = h;
+      layer.textContent = '';
+      const small = innerWidth < 760;
+      const n = Math.max(8, Math.min(small ? 12 : 22, Math.round(h / (small ? 170 : 130))));
+      let seed = 7;
+      const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+      for (let i = 0; i < n; i++) {
+        const im = document.createElement('img');
+        im.src = 'assets/kin-face.png'; im.alt = ''; im.decoding = 'async';
+        im.style.top = ((i + rnd() * 0.8) / n * 100).toFixed(1) + '%';
+        im.style.left = (i % 2 ? 50 + rnd() * 42 : 2 + rnd() * 42).toFixed(1) + '%';
+        im.style.setProperty('--s', ((46 + rnd() * 50) * (small ? 0.7 : 1)).toFixed(0) + 'px');
+        im.style.setProperty('--dur', (9 + rnd() * 8).toFixed(1) + 's');
+        im.style.setProperty('--delay', (-rnd() * 12).toFixed(1) + 's');
+        im.style.setProperty('--dx', ((rnd() - 0.5) * 44).toFixed(0) + 'px');
+        im.style.setProperty('--r0', ((rnd() - 0.5) * 34).toFixed(0) + 'deg');
+        im.style.setProperty('--r1', ((rnd() - 0.5) * 34).toFixed(0) + 'deg');
+        layer.appendChild(im);
+      }
+    };
+    build();
+    if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(build, 250); }).observe(host);
+    if ('IntersectionObserver' in window) new IntersectionObserver(en => layer.classList.toggle('off', !en[0].isIntersecting)).observe(host);
+  });
+}
+
 /* ================================ Init ============================= */
 document.addEventListener('DOMContentLoaded', () => {
   $$('img').forEach(img => { if (img.complete && img.naturalWidth === 0) tryNextExt(img); });
@@ -668,9 +668,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initTransitions();
   initGrid();
   initWaves();
-  initCursor();
+  initHeadsBg();
   initTilt();
-  initScrollFx();
   initPoke();
   initFooterTalk();
   initSecrets();
