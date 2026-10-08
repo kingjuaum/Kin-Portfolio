@@ -20,15 +20,169 @@ const CONTENT = {
     .map((youtube, i) => ({ youtube, image: '', thumb: '', title: 'Trabalho ' + (i + 1) }))
 };
 
+/* =====================================================================
+   DESCRIÇÕES DOS PROJETOS  —  aparecem ao lado do vídeo quando ele é aberto
+   ---------------------------------------------------------------------
+   A chave é o ID do YouTube do vídeo. Como o mesmo vídeo pode aparecer na Home
+   e na aba dele, a descrição é escrita uma vez só e vale para os dois lugares.
+   Para cada vídeo: title (título), desc (resumo) e role (o que você fez),
+   em português (pt) e em inglês (en).
+   Vídeo sem entrada aqui abre só o player, como antes.
+   ===================================================================== */
+const INFO = {
+  /* ---------------------------- Vídeos longos ---------------------------- */
+  'geeIieObAyY': {
+    pt: { title: 'Stream Pack',
+          desc: 'Overlays de início e fim de stream que criei para as minhas lives. Animei a cabeça no After Effects e montei o restante da composição no Premiere.',
+          role: 'Motion design e edição' },
+    en: { title: 'Stream Pack',
+          desc: 'Start and end-of-stream overlays I made for my own livestreams. I animated the character head in After Effects and built the rest of the composition in Premiere.',
+          role: 'Motion design and editing' }
+  },
+  '2fXMITWJsYU': {
+    pt: { title: 'O jogo que mudou a forma como eu vejo jogos de terror',
+          desc: 'Vídeo para o meu canal do YouTube sobre como Silent Hill 2 Remake mudou a minha percepção sobre jogos de terror.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'The game that changed how I see horror games',
+          desc: 'A video for my YouTube channel about how the Silent Hill 2 Remake changed my perception of horror games.',
+          role: 'From script to final edit' }
+  },
+  'yAhCQgp-two': {
+    pt: { title: 'Animação para o vídeo “Analisando creepypastas antigas pra ver se elas realmente eram assustadoras”',
+          desc: 'Vídeo produzido para o meu canal do YouTube, em que revisito creepypastas antigas (2010–2012) para descobrir se elas davam mesmo medo ou se era só o nosso cérebro de criança vendo terror em tudo.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'Animation for the video “Analyzing old creepypastas to see if they were really scary”',
+          desc: 'A video made for my YouTube channel, where I revisit old creepypastas (2010–2012) to find out whether they were really scary or if it was just our childhood brains finding horror in everything.',
+          role: 'From script to final edit' }
+  },
+  '_F1QO28zyuQ': {
+    pt: { title: 'Pokémon mudou a minha vida (e a sua provavelmente também)',
+          desc: 'Vídeo para o Instagram e o TikTok contando um pouco da minha história com videogames: onde foi o meu primeiro contato e como Pokémon virou a minha zona de conforto em momentos difíceis da vida.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'Pokémon changed my life (and probably yours too)',
+          desc: 'A video for Instagram and TikTok about my history with video games: where I first got into them and how Pokémon became my comfort zone during hard times.',
+          role: 'From script to final edit' }
+  },
+  'PIPRP-wYqUs': {
+    pt: { title: 'Como Pokémon mudou a minha vida',
+          desc: 'Vídeo para o meu canal do YouTube em que me aprofundo e conto com mais detalhes como a saga Pokémon virou a minha zona de conforto e me moldou na pessoa que sou hoje.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'How Pokémon changed my life',
+          desc: 'A video for my YouTube channel where I go deeper into how the Pokémon saga became my comfort zone and shaped me into the person I am today.',
+          role: 'From script to final edit' }
+  },
+  'uSbEdqzeVwA': {
+    pt: { title: 'Aetherion Pro vs Max: qual deles escolher?',
+          desc: 'Vídeo editado para o canal Meu Tech Mundo no Adobe Premiere, com edição dinâmica e muitos B-rolls para construir a melhor narrativa possível no comparativo.',
+          role: 'Edição de vídeo' },
+    en: { title: 'Aetherion Pro vs Max: which one should you pick?',
+          desc: 'A video edited for the channel Meu Tech Mundo in Adobe Premiere, with dynamic editing and plenty of B-roll to build the best possible narrative for the comparison.',
+          role: 'Video editing' }
+  },
+  'PKKpR2hgVmM': {
+    pt: { title: 'Explorando creepypastas antigas pra ver se elas realmente eram assustadoras',
+          desc: 'Trecho do vídeo produzido para o meu canal do YouTube, em que revisito creepypastas antigas (2010–2012) para descobrir se davam mesmo medo ou se era só o nosso cérebro de criança que se assustava fácil demais.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'Exploring old creepypastas to see if they were really scary',
+          desc: 'An excerpt from the video made for my YouTube channel, where I revisit old creepypastas (2010–2012) to find out whether they were really scary or if our childhood brains just got spooked too easily.',
+          role: 'From script to final edit' }
+  },
+
+  /* ---------------------------- Vídeos curtos ---------------------------- */
+  'c1bmlTtrYv8': {
+    pt: { title: 'Abrindo a box da Sylveon da coleção de 30 anos de Pokémon TCG',
+          desc: 'Short para o Instagram e o TikTok abrindo um produto da coleção de 30 anos de Pokémon.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'Opening the Sylveon box from the Pokémon TCG 30th anniversary collection',
+          desc: 'A short for Instagram and TikTok, opening a product from the Pokémon 30th anniversary collection.',
+          role: 'From script to final edit' }
+  },
+  'F9GNgwOAREg': {
+    pt: { title: 'Dois idiotas presos em uma pousada do djabo',
+          desc: 'Short para o Instagram e o TikTok feito a partir de uma live de “Fears to Fathom” na minha Twitch. Separei alguns trechos e montei uma edição dinâmica e bem-humorada.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'Two idiots trapped in a hellish inn',
+          desc: 'A short for Instagram and TikTok made from a “Fears to Fathom” livestream on my Twitch. I picked a few moments from the stream and cut them into a dynamic, funny edit.',
+          role: 'From script to final edit' }
+  },
+  'bIKyqQmvj1Y': {
+    pt: { title: 'Se você teve um Nintendo Wii, provavelmente já jogou esses jogos',
+          desc: 'Short para o Instagram e o TikTok feito para relembrar alguns dos jogos do Nintendo Wii que mais marcaram quem teve (ou ainda tem) o console.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'If you had a Nintendo Wii, you probably played these games',
+          desc: 'A short for Instagram and TikTok to bring back some of the Nintendo Wii games that left the biggest mark on anyone who had (or still has) the console.',
+          role: 'From script to final edit' }
+  },
+  'RxvgWMx4kLw': {
+    pt: { title: 'Se você teve um Xbox 360 na infância, provavelmente jogou algum desses jogos',
+          desc: 'Short para o Instagram e o TikTok feito para relembrar alguns dos jogos do Xbox 360 que mais marcaram quem teve (ou ainda tem) o console.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'If you had an Xbox 360 as a kid, you probably played some of these games',
+          desc: 'A short for Instagram and TikTok to bring back some of the Xbox 360 games that left the biggest mark on anyone who had (or still has) the console.',
+          role: 'From script to final edit' }
+  },
+  '4lkBaCZFCPo': {
+    pt: { title: 'Personagens que eu chamaria pra um churrasco (se eles fossem reais)',
+          desc: 'Short para o Instagram e o TikTok, uma brincadeira em que listo personagens de videogames que eu chamaria para um churrasco lá em casa. Um vídeo bem-humorado e dinâmico.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'Characters I would invite to a barbecue (if they were real)',
+          desc: 'A short for Instagram and TikTok, a playful list of video game characters I would invite to a barbecue at my place. A funny, dynamic video.',
+          role: 'From script to final edit' }
+  },
+  '55mLGlL2gaQ': {
+    pt: { title: 'Fui humilhado por uma streamer em live…',
+          desc: 'Short para o Instagram e o TikTok a partir de um react que fiz em stream: a criadora de conteúdo Eudinha reagindo e analisando o meu perfil do Instagram. Bem-humorado e dinâmico.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'I got roasted by a streamer on a livestream…',
+          desc: 'A short for Instagram and TikTok from a reaction I did on stream: content creator Eudinha reacting to and analyzing my Instagram profile. Funny and dynamic.',
+          role: 'From script to final edit' }
+  },
+
+  /* ------------------------------- Outros -------------------------------- */
+  'bhpDx25A4EE': {
+    pt: { title: 'Motion de final de vídeo',
+          desc: 'Motion simples criado no After Effects para ser usado no final de vídeos.',
+          role: 'Motion design (After Effects)' },
+    en: { title: 'Video outro motion',
+          desc: 'A simple motion piece created in After Effects to be used at the end of videos.',
+          role: 'Motion design (After Effects)' }
+  },
+  'Scsorm5a4c4': {
+    pt: { title: 'Overlay de início de live',
+          desc: 'Overlay de abertura que criei para as minhas lives.',
+          role: 'Motion design' },
+    en: { title: 'Livestream intro overlay',
+          desc: 'An opening overlay I created for my livestreams.',
+          role: 'Motion design' }
+  },
+  'blzK2CbFfXI': {
+    pt: { title: 'Encerramento com chat da Twitch',
+          desc: 'Encerramento de vídeo que fiz para o meu canal de gameplay, simulando o chat da Twitch em uma animação boba e divertida.',
+          role: 'Motion design e animação' },
+    en: { title: 'Twitch chat outro',
+          desc: 'A video outro I made for my gameplay channel, simulating the Twitch chat in a silly, fun animation.',
+          role: 'Motion design and animation' }
+  },
+  'ThSuYlbClqY': {
+    pt: { title: 'Overlay de final de live',
+          desc: 'Overlay de encerramento que criei para as minhas lives.',
+          role: 'Motion design' },
+    en: { title: 'Livestream ending overlay',
+          desc: 'A closing overlay I created for my livestreams.',
+          role: 'Motion design' }
+  }
+};
+
 /* ============================ Idiomas ============================ */
 const EN = {
   nav_long: 'Long videos', nav_short: 'Short videos', nav_other: 'Others', nav_contact: 'Contact',
   hero_hi: "Hi, I'm Kin!", btn_talk: "Let's talk", btn_projects: 'See projects',
-  svc_edit: 'Video Editing', svc_motion: 'Motion Design', svc_film: 'Filmmaking',
+  svc_edit: 'Video Editing', svc_motion: 'Motion Design', svc_film: 'Video Making',
+    nf_bar: 'Error 404', nf_title: 'Oops! This page doesn\'t exist.', nf_text: 'Kin looked everywhere and found nothing. The link may be wrong, or the page got lost in the middle of a render.', nf_btn: 'Back to home',
   works: 'Works', long_label: 'Long Videos', short_label: 'Short Videos',
   title_long: 'Long Videos', title_short: 'Short Videos', title_other: 'Other Works',
   about: 'About me',
-  about_text: "Hi, I'm João Vitor! I'm a <strong>video editor</strong> and <strong>motion designer</strong> who also lives the content-creation side of things. I work with tools like <strong>Premiere, After Effects and Photoshop</strong> to create <strong>high-impact visuals</strong>. Because I write and make my own videos for the web, I've developed a sharp eye for the <strong>rhythm and aesthetics</strong> of audiovisual work. My goal is always to deliver <strong>dynamic edits</strong> that mix solid technique with the fast language the internet demands!",
+  about_text: "Hi, I'm João Vitor! I'm a <strong>video editor</strong> and <strong>motion designer</strong> who also works as a <strong>scriptwriter</strong>, <strong>thumbnail maker</strong> and <strong>video maker</strong>, living the content-creation side of things. I work with tools like <strong>Premiere, After Effects and Photoshop</strong> to create <strong>high-impact visuals</strong>. Because I write and make my own videos for the web, I've developed a sharp eye for the <strong>rhythm and aesthetics</strong> of audiovisual work. My goal is always to deliver <strong>dynamic edits</strong> that mix solid technique with the fast language the internet demands!",
   contacts: 'My Contacts',
   hero_t1: 'Video Editor &', hero_t2: 'Motion Designer',
   hero_sub: 'Dynamic edits, with technique and the fast language the internet demands.',
@@ -66,6 +220,13 @@ function tryNextExt(img) {
 }
 document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) tryNextExt(e.target); }, true);
 
+/* Descrição do projeto no idioma atual (ou null se o vídeo não tiver) */
+function infoFor(item) {
+  const e = item && item.youtube && INFO[item.youtube];
+  if (!e) return null;
+  return (curLang() === 'en' && e.en) ? e.en : e.pt;
+}
+
 const ytThumb = (id, quality) => 'https://i.ytimg.com/vi/' + id + '/' + quality + '.jpg';
 
 /* ========================= Cartões de vídeo ======================== */
@@ -83,30 +244,64 @@ function fillCards() {
       }
       card.prepend(img);
     }
-    card.setAttribute('aria-label', item.title || 'Abrir vídeo');
+    const info = infoFor(item);
+    card.setAttribute('aria-label', (info && info.title) || item.title || 'Abrir vídeo');
     card.addEventListener('click', () => openItem(card.dataset.group, +card.dataset.index));
   });
 }
 
 /* =============================== Modal ============================= */
 let lastFocus = null;
+let modalCurrent = null;   // { group, index } do vídeo que está aberto
 function modalEl() {
   let m = $('#modal');
   if (m) return m;
   m = document.createElement('div');
   m.id = 'modal'; m.className = 'modal'; m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true');
-  m.innerHTML = '<div class="modal-box"><button class="modal-close" aria-label="Fechar">×</button><div class="modal-content"></div></div>';
+  m.innerHTML = '<div class="modal-box"><button class="modal-close" aria-label="Fechar">×</button><div class="modal-content"></div></div>'
+    + '<button class="modal-nav prev" aria-label="Vídeo anterior">‹</button>'
+    + '<button class="modal-nav next" aria-label="Próximo vídeo">›</button>'
+    + '<div class="modal-count" aria-live="polite"></div>';
   document.body.appendChild(m);
-  m.addEventListener('click', e => { if (e.target === m || e.target.closest('.modal-close')) closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  m.addEventListener('click', e => {
+    if (e.target === m || e.target.closest('.modal-close')) { closeModal(); return; }
+    const nb = e.target.closest('.modal-nav');
+    if (nb) stepModal(nb.classList.contains('next') ? 1 : -1);
+  });
+  document.addEventListener('keydown', e => {
+    if (!m.classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    else if (e.key === 'ArrowRight') stepModal(1);
+    else if (e.key === 'ArrowLeft') stepModal(-1);
+  });
   return m;
 }
 function closeModal() {
   const m = $('#modal');
   if (!m || !m.classList.contains('open')) return;
   m.classList.remove('open');
+  modalCurrent = null;
   $('.modal-content', m).innerHTML = '';
   if (lastFocus) lastFocus.focus();
+}
+/* Ordem dos vídeos = a ordem em que os cartões aparecem na tela */
+function modalOrder(group) {
+  return $$('.video-card[data-group="' + group + '"]').map(c => +c.dataset.index).filter(i => (CONTENT[group] || [])[i]);
+}
+function stepModal(dir) {
+  if (!modalCurrent) return;
+  const order = modalOrder(modalCurrent.group);
+  if (order.length < 2) return;
+  let i = order.indexOf(modalCurrent.index);
+  i = i < 0 ? 0 : (i + dir + order.length) % order.length;
+  openItem(modalCurrent.group, order[i]);
+}
+function updateModalNav(m, group, index) {
+  const order = modalOrder(group), i = order.indexOf(index), en = curLang() === 'en';
+  m.classList.toggle('has-nav', order.length > 1 && i >= 0);
+  $('.modal-nav.prev', m).setAttribute('aria-label', en ? 'Previous video' : 'Vídeo anterior');
+  $('.modal-nav.next', m).setAttribute('aria-label', en ? 'Next video' : 'Próximo vídeo');
+  $('.modal-count', m).textContent = i >= 0 ? (i + 1) + ' / ' + order.length : '';
 }
 function openItem(group, index) {
   const item = (CONTENT[group] || [])[index];
@@ -120,19 +315,45 @@ function openItem(group, index) {
   }
   const m = modalEl();
   const box = $('.modal-box', m), content = $('.modal-content', m);
+  const info = infoFor(item);
+  const lang = curLang();
+  const player = () => '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(item.youtube) + '?autoplay=1&rel=0" referrerpolicy="strict-origin-when-cross-origin" title="' + ((info && info.title) || item.title || 'Vídeo').replace(/"/g, '&quot;') + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
   box.classList.toggle('vertical', vertical);
-  content.style.cssText = 'width:100%;height:100%;display:grid;place-items:center';
-  if (item && item.youtube) {
-    content.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(item.youtube) + '?autoplay=1&rel=0" referrerpolicy="strict-origin-when-cross-origin" title="' + (item.title || 'Vídeo') + '" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>';
-  } else if (item && item.image) {
-    content.innerHTML = '<img src="' + item.image + '" alt="' + (item.title || '') + '">';
+  box.classList.toggle('has-info', !!(info && item.youtube));
+  if (info && item.youtube) {
+    // Vídeo + descrição do projeto ao lado (no celular, a descrição vem embaixo)
+    content.style.cssText = '';
+    content.textContent = '';
+    const mv = document.createElement('div'); mv.className = 'mv'; mv.innerHTML = player();
+    const mi = document.createElement('aside'); mi.className = 'mi';
+    const h = document.createElement('h2'); h.textContent = info.title;
+    const p = document.createElement('p'); p.className = 'mi-desc'; p.textContent = info.desc;
+    mi.append(h, p);
+    if (info.role) {
+      const r = document.createElement('p'); r.className = 'mi-role';
+      const b = document.createElement('strong'); b.textContent = (lang === 'en' ? 'My role' : 'Meu papel') + ': ';
+      r.append(b, info.role); mi.append(r);
+    }
+    content.append(mv, mi);
+    m.setAttribute('aria-label', info.title);
   } else {
-    const lang = document.documentElement.dataset.lang;
-    content.textContent = lang === 'en' ? EN.soon : 'Em breve';
+    content.style.cssText = 'width:100%;height:100%;display:grid;place-items:center';
+    m.setAttribute('aria-label', (item && item.title) || 'Vídeo');
+    if (item && item.youtube) {
+      content.innerHTML = player();
+    } else if (item && item.image) {
+      content.innerHTML = '<img src="' + item.image + '" alt="' + (item.title || '') + '">';
+    } else {
+      content.textContent = lang === 'en' ? EN.soon : 'Em breve';
+    }
   }
-  lastFocus = document.activeElement;
+  const wasOpen = m.classList.contains('open');
+  if (!wasOpen) lastFocus = document.activeElement;
+  modalCurrent = { group, index };
+  updateModalNav(m, group, index);
+  m.scrollTop = 0;
   m.classList.add('open');
-  $('.modal-close', m).focus();
+  if (!wasOpen) $('.modal-close', m).focus();
 }
 
 /* ====== Ícones flutuantes do hero: levam a um vídeo da página ====== */
@@ -449,6 +670,7 @@ function initPoke() {
   let count = 0, calmTimer = 0, sulkIdx = 0;
   fig.addEventListener('click', () => {
     count++;
+    if (count === 6) kinUnlock('poke');
     const lang = curLang(), list = POKE[lang];
     let text;
     if (count <= list.length) text = list[count - 1];
@@ -484,6 +706,7 @@ function initFooterTalk() {
       const arr = lines[side][curLang()];
       const b = sayIn(img.parentElement, arr[n++ % arr.length], 'foot ' + side);
       img.classList.remove('wave'); void img.offsetWidth; img.classList.add('wave');
+      kinUnlock(side === 'left' ? 'footL' : 'footR');
     });
   });
 }
@@ -495,7 +718,7 @@ function initSecrets() {
   document.addEventListener('keydown', e => {
     const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
     pos = (k === seq[pos]) ? pos + 1 : (k === seq[0] ? 1 : 0);
-    if (pos === seq.length) { pos = 0; kinRain(); }
+    if (pos === seq.length) { pos = 0; kinRain(); kinUnlock('konami'); }
   });
 
   // logo: 5 cliques seguidos
@@ -508,18 +731,19 @@ function initSecrets() {
       e.preventDefault();
       window.scrollTo({ top: 0, behavior: 'smooth' });
       n++; clearTimeout(timer); timer = setTimeout(() => { n = 0; }, 1500);
-      if (n >= 5) { n = 0; logo.classList.remove('spin360'); void logo.offsetWidth; logo.classList.add('spin360'); toast(curLang() === 'en' ? '🎞️ Cut! You found a secret.' : '🎞️ Corta! Você achou um segredo.'); }
+      if (n >= 5) { n = 0; logo.classList.remove('spin360'); void logo.offsetWidth; logo.classList.add('spin360'); if (!kinUnlock('logo')) toast(curLang() === 'en' ? '🎞️ Cut! You found a secret.' : '🎞️ Corta! Você achou um segredo.'); }
     });
   }
 
   // carinhas da faixa vermelha
   $$('.marquee-item .faded').forEach(img => img.addEventListener('click', () => {
     img.classList.remove('popped'); void img.offsetWidth; img.classList.add('popped');
+    kinUnlock('faces');
   }));
 
   // foto do "Sobre mim"
   const p = $('.about .portrait');
-  if (p) p.addEventListener('click', () => toast(curLang() === 'en' ? '📸 Taken at 3 AM, between one render and another.' : '📸 Foto tirada às 3 da manhã, entre um render e outro.'));
+  if (p) p.addEventListener('click', () => { if (!kinUnlock('portrait')) toast(curLang() === 'en' ? '📸 Taken at 3 AM, between one render and another.' : '📸 Foto tirada às 3 da manhã, entre um render e outro.'); });
 
   console.log('%cOpa, curioso! 👀 Tem segredos escondidos por aqui. Dica: ↑ ↑ ↓ ↓ ← → ← → B A', 'font:16px sans-serif;color:#cd0024');
 }
@@ -531,7 +755,7 @@ function kinRain() {
   layer.className = 'kin-rain'; layer.setAttribute('aria-hidden', 'true');
   for (let i = 0; i < 38; i++) {
     const im = document.createElement('img');
-    im.src = 'assets/kin-face.png'; im.alt = '';
+    im.src = 'assets/kin-face-sm.webp'; im.alt = '';
     im.style.left = (Math.random() * 100) + 'vw';
     im.style.width = (28 + Math.random() * 40) + 'px';
     im.style.animationDuration = (2.6 + Math.random() * 2.4) + 's';
@@ -639,7 +863,7 @@ function initHeadsBg() {
       const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
       for (let i = 0; i < n; i++) {
         const im = document.createElement('img');
-        im.src = 'assets/kin-face.png'; im.alt = ''; im.decoding = 'async';
+        im.src = 'assets/kin-face-sm.webp'; im.alt = ''; im.decoding = 'async';
         im.style.top = ((i + rnd() * 0.8) / n * 100).toFixed(1) + '%';
         im.style.left = (i % 2 ? 50 + rnd() * 42 : 2 + rnd() * 42).toFixed(1) + '%';
         im.style.setProperty('--s', ((46 + rnd() * 50) * (small ? 0.7 : 1)).toFixed(0) + 'px');
@@ -655,6 +879,106 @@ function initHeadsBg() {
     if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(build, 250); }).observe(host);
     if ('IntersectionObserver' in window) new IntersectionObserver(en => layer.classList.toggle('off', !en[0].isIntersecting)).observe(host);
   });
+}
+
+/* =====================================================================
+   CONQUISTAS — troféus estilo PlayStation, um para cada segredo do site
+   O progresso fica salvo no navegador de cada visitante (localStorage).
+   Para testar do zero: localStorage.removeItem('kinTrophies')
+   ===================================================================== */
+const TROPHY_KEY = 'kinTrophies';
+const TIER_LABEL = {
+  pt: { bronze: 'Troféu de bronze', silver: 'Troféu de prata', gold: 'Troféu de ouro', platinum: 'Troféu de platina', done: 'desbloqueado' },
+  en: { bronze: 'Bronze trophy', silver: 'Silver trophy', gold: 'Gold trophy', platinum: 'Platinum trophy', done: 'unlocked' }
+};
+/* img = foto ao lado do troféu (assets/av-*.webp) */
+const ACH = {
+  logo:     { tier: 'bronze', img: 'av-face',
+              pt: { t: 'Corta!', d: 'Cinco cliques no logo e um segredo encontrado. Alguém aqui gosta de girar coisas.' },
+              en: { t: 'Cut!', d: 'Five clicks on the logo and a secret found. Someone here likes spinning things.' } },
+  faces:    { tier: 'bronze', img: 'av-face',
+              pt: { t: 'Estourou a bolha', d: 'Você cutucou uma das carinhas da faixa vermelha.' },
+              en: { t: 'Pop!', d: 'You poked one of the little faces on the red strip.' } },
+  portrait: { tier: 'bronze', img: 'av-portrait',
+              pt: { t: 'Madrugada de render', d: 'Foto tirada às 3 da manhã, entre um render e outro.' },
+              en: { t: 'Render o\'clock', d: 'Photo taken at 3 AM, between one render and another.' } },
+  footL:    { tier: 'bronze', img: 'av-real',
+              pt: { t: 'Boas-vindas', d: 'O Kin do rodapé agradeceu a sua visita.' },
+              en: { t: 'Welcome', d: 'The Kin in the footer thanked you for stopping by.' } },
+  footR:    { tier: 'bronze', img: 'av-body',
+              pt: { t: 'Aceita café?', d: 'O outro Kin do rodapé aceita café como forma de pagamento.' },
+              en: { t: 'Coffee?', d: 'The other Kin in the footer accepts coffee as payment.' } },
+  poke:     { tier: 'silver', img: 'av-body',
+              pt: { t: 'Mascote estressado', d: 'Você cutucou o Kin até ele ficar bravo. Ele vai cobrar hora extra.' },
+              en: { t: 'Stressed mascot', d: 'You poked Kin until he got angry. He is charging overtime.' } },
+  lost:     { tier: 'silver', img: 'av-pixel',
+              pt: { t: 'Perdido na rede', d: 'Você caiu na página 404. O Kin finge que não viu.' },
+              en: { t: 'Lost online', d: 'You landed on the 404 page. Kin pretends he didn\'t see.' } },
+  konami:   { tier: 'gold', img: 'av-real',
+              pt: { t: 'Modo Kin', d: 'Você digitou o código secreto. Chuva de cabeças liberada!' },
+              en: { t: 'Kin mode', d: 'You typed the secret code. Head rain unlocked!' } }
+};
+const PLATINUM = {
+  img: 'av-portrait',
+  pt: { t: 'Platina!', d: 'Você encontrou todos os segredos do site. Obrigado por explorar cada cantinho!' },
+  en: { t: 'Platinum!', d: 'You found every secret on the site. Thanks for exploring every corner!' }
+};
+const TROPHY_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 3h12v2h3v3c0 2.2-1.8 4-4 4h-.3A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.3 12H7C4.8 12 3 10.2 3 8V5h3V3zm0 4H5v1c0 1.1.9 2 2 2V7zm12 0v3c1.1 0 2-.9 2-2V7h-2z"/></svg>';
+
+const trophyMem = new Set();   // reserva caso o navegador bloqueie o localStorage
+function trophyList() {
+  let saved = [];
+  try { const a = JSON.parse(store(TROPHY_KEY) || '[]'); if (Array.isArray(a)) saved = a; } catch (e) { /* ignora */ }
+  return Array.from(new Set(saved.concat(Array.from(trophyMem))));
+}
+function kinUnlock(id) {
+  if (!ACH[id]) return false;
+  const have = trophyList();
+  if (have.includes(id)) return false;
+  have.push(id); trophyMem.add(id);
+  const ids = Object.keys(ACH);
+  const done = ids.filter(k => have.includes(k)).length;
+  const all = done === ids.length;
+  const giveGold = all && !have.includes('platinum');
+  if (giveGold) { have.push('platinum'); trophyMem.add('platinum'); }
+  store(TROPHY_KEY, JSON.stringify(have));
+  queueTrophy(id, done, ids.length);
+  if (giveGold) queueTrophy('platinum', done, ids.length);
+  return true;
+}
+window.kinUnlock = kinUnlock;
+
+const trophyQ = []; let trophyBusy = false;
+function queueTrophy(id, n, total) { trophyQ.push({ id, n, total }); if (!trophyBusy) nextTrophy(); }
+function nextTrophy() {
+  const job = trophyQ.shift();
+  if (!job) { trophyBusy = false; return; }
+  trophyBusy = true;
+  const lang = curLang(), L = TIER_LABEL[lang];
+  const plat = job.id === 'platinum';
+  const def = plat ? PLATINUM : ACH[job.id];
+  const tier = plat ? 'platinum' : def.tier;
+  const txt = def[lang] || def.pt;
+  let stack = $('.trophy-stack');
+  if (!stack) {
+    stack = document.createElement('div'); stack.className = 'trophy-stack';
+    stack.setAttribute('role', 'status'); stack.setAttribute('aria-live', 'polite');
+    document.body.appendChild(stack);
+  }
+  const card = document.createElement('div');
+  card.className = 'trophy ' + tier;
+  card.innerHTML = '<img class="tr-img" alt="" width="58" height="58" src="assets/' + def.img + '.webp">'
+    + '<div class="tr-text"><div class="tr-kind">' + TROPHY_SVG + '<span></span></div><div class="tr-title"></div><div class="tr-desc"></div></div>';
+  $('.tr-kind span', card).textContent = L[tier] + ' ' + L.done + (plat ? '' : ' · ' + job.n + '/' + job.total);
+  $('.tr-title', card).textContent = txt.t;
+  $('.tr-desc', card).textContent = txt.d;
+  stack.appendChild(card);
+  void card.offsetWidth;
+  card.classList.add('show');
+  setTimeout(() => {
+    card.classList.remove('show'); card.classList.add('hide');
+    setTimeout(() => { card.remove(); nextTrophy(); }, 600);
+  }, plat ? 6500 : 4800);
 }
 
 /* ================================ Init ============================= */

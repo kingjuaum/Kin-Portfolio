@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 — Página não encontrada | João Vitor</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#cd0024">
+<script>
+/* Esta página é servida em qualquer endereço que não existe, então os caminhos precisam ser absolutos.
+   No GitHub Pages (https://usuario.github.io/repositorio/) a base é /repositorio/. */
+(function () {
+  if (location.protocol === 'file:') return;
+  var seg = location.pathname.split('/')[1];
+  var base = (/\.github\.io$/.test(location.hostname) && seg) ? '/' + seg + '/' : '/';
+  document.write('<base href="' + base + '">');
+})();
+document.documentElement.classList.add('js');
+</script>
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500&family=Inter:wght@400&family=Montserrat:wght@400;700&family=Montserrat+Alternates:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="nf">
+<main class="nf-stage">
+  <div class="nf-window">
+    <div class="nf-bar"><span data-i18n="nf_bar">Erro 404</span><a class="nf-x" href="index.html" aria-label="Fechar e voltar ao início">×</a></div>
+    <div class="nf-body">
+      <img class="nf-art" src="assets/404-kin.webp" alt="Cabeça pixelada do Kin com a mensagem 404 not found" width="380" height="298">
+      <h1 data-i18n="nf_title">Opa! Essa página não existe.</h1>
+      <p data-i18n="nf_text">O Kin procurou em todo canto e não achou nada. O link pode estar errado, ou a página se perdeu no meio de um render.</p>
+      <a class="nf-btn" href="index.html" data-i18n="nf_btn">Voltar para o início</a>
+    </div>
+  </div>
+</main>
+<script src="script.js"></script>
+<script>document.addEventListener('DOMContentLoaded', function () { if (window.kinUnlock) window.kinUnlock('lost'); });</script>
+</body>
+</html>

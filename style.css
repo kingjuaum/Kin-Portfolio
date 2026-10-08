@@ -91,9 +91,6 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   min-height: 220px;
   overflow: hidden;
   background:
-    url('assets/bliss.jpg') center / cover no-repeat,
-    url('assets/bliss.jpeg') center / cover no-repeat,
-    url('assets/bliss.png') center / cover no-repeat,
     url('assets/bliss.webp') center / cover no-repeat,
     linear-gradient(#5ea8ee 0 55%, #4f9a2c 55%);
 }
@@ -188,6 +185,33 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .modal-box iframe, .modal-box img { width: 100%; height: 100%; border: 0; object-fit: contain; border-radius: 10px; }
 .modal-close { position: absolute; top: -48px; right: 0; color: #fff; font-size: 36px; line-height: 1; padding: 4px 10px; transition: rotate .3s var(--ease); }
 .modal-close:hover { rotate: 90deg; }
+
+/* ---- Modal com a descrição do projeto (vídeo + texto ao lado) ---- */
+.modal { overflow-y: auto; }
+.modal-box.has-info { width: min(94vw, 1120px); aspect-ratio: auto; background: transparent; margin: auto; display: block; text-align: left; font-size: 16px; }
+.modal-box.has-info .modal-content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 360px); width: 100%; height: auto; border-radius: 14px; overflow: hidden; background: var(--paper); }
+.mv { background: #000; aspect-ratio: 16 / 9; min-width: 0; }
+.mv iframe { display: block; width: 100%; height: 100%; border: 0; border-radius: 0; }
+.mi { display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 28px 28px 30px; color: var(--dark); font-family: var(--font-body); }
+.mi h2 { font-family: var(--font-display); font-weight: 500; font-size: clamp(20px, 2vw, 26px); line-height: 1.18; color: var(--red); }
+.mi-desc { font-size: 15px; line-height: 1.65; }
+.mi-role { margin-top: auto; padding-top: 14px; border-top: 2px solid var(--rule); font-size: 14px; line-height: 1.5; }
+.mi-role strong { font-family: var(--font-display); font-weight: 500; color: var(--red); }
+
+/* vídeos verticais (shorts): player 9:16 à esquerda, texto à direita */
+.modal-box.vertical.has-info { width: min(94vw, 860px); height: auto; aspect-ratio: auto; max-width: 94vw; }
+.modal-box.vertical.has-info .modal-content { grid-template-columns: auto minmax(0, 1fr); }
+.modal-box.vertical.has-info .mv { --vh: min(78vh, 700px); height: var(--vh); width: calc(var(--vh) * 9 / 16); aspect-ratio: auto; }
+
+@media (max-width: 760px) {
+  .modal { padding: 56px 12px 24px; }
+  .modal-box.has-info, .modal-box.vertical.has-info { width: 100%; max-width: 100%; }
+  .modal-box.has-info .modal-content, .modal-box.vertical.has-info .modal-content { grid-template-columns: 1fr; }
+  .modal-box.vertical.has-info .mv { --vh: min(62vh, 520px); width: 100%; height: var(--vh); display: grid; place-items: center; }
+  .modal-box.vertical.has-info .mv iframe { height: 100%; width: auto; aspect-ratio: 9 / 16; max-width: 100%; }
+  .mi { padding: 20px 20px 24px; }
+  .modal-close { top: -46px; }
+}
 
 /* ============ Contatos / rodapé ============ */
 .site-footer { position: relative; background: var(--red); color: #fff; height: 296px; overflow: hidden; margin-top: 49px; }
@@ -471,3 +495,64 @@ main + .site-footer { margin-top: 0; }
   from { transform: translate3d(calc(var(--dx, 20px) * -1), -22px, 0) rotate(var(--r0, -10deg)); }
   to   { transform: translate3d(var(--dx, 20px), 22px, 0) rotate(var(--r1, 10deg)); }
 }
+
+
+/* =====================================================================
+   Navegar entre vídeos no modal
+   ===================================================================== */
+.modal-nav { position: fixed; top: 50%; translate: 0 -50%; z-index: 2; width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .14); color: #fff; font-size: 36px; line-height: 1; padding-bottom: 4px; transition: background .2s, scale .2s; }
+.modal-nav:hover, .modal-nav:focus-visible { background: var(--red); scale: 1.08; }
+.modal-nav.prev { left: 16px; }
+.modal-nav.next { right: 16px; }
+.modal-count { position: fixed; bottom: 18px; left: 50%; translate: -50% 0; z-index: 2; color: rgba(255, 255, 255, .85); font-family: var(--font-display); font-size: 16px; letter-spacing: .04em; }
+.modal:not(.has-nav) .modal-nav, .modal:not(.has-nav) .modal-count { display: none; }
+@media (max-width: 1240px) {
+  .modal { padding-bottom: 84px; }
+  .modal-nav { top: auto; bottom: 12px; translate: none; width: 48px; height: 48px; }
+  .modal-nav.prev { left: 16px; }
+  .modal-nav.next { right: 16px; }
+  .modal-count { bottom: 26px; }
+}
+
+/* =====================================================================
+   Conquistas (troféus estilo PlayStation)
+   ===================================================================== */
+.trophy-stack { position: fixed; top: 14px; left: 50%; translate: -50% 0; z-index: 300; width: min(92vw, 410px); pointer-events: none; }
+.trophy { --tc: #cd7f32; position: relative; display: grid; grid-template-columns: 58px minmax(0, 1fr); align-items: center; gap: 14px; padding: 10px 20px 10px 10px; overflow: hidden; background: rgba(16, 18, 26, .97); color: #fff; border: 2px solid var(--tc); border-radius: 22px; box-shadow: 0 14px 34px rgba(0, 0, 0, .35); opacity: 0; translate: 0 -150%; transition: translate .55s var(--ease), opacity .4s; }
+.trophy.show { opacity: 1; translate: 0 0; }
+.trophy.hide { opacity: 0; translate: 0 -150%; }
+.trophy.bronze { --tc: #cd7f32; }
+.trophy.silver { --tc: #c9ced8; }
+.trophy.gold { --tc: #f5c542; }
+.trophy.platinum { --tc: #8fd8ff; box-shadow: 0 0 0 3px rgba(143, 216, 255, .25), 0 14px 40px rgba(143, 216, 255, .45); }
+.trophy::after { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .22) 50%, transparent 65%); translate: -120% 0; }
+.trophy.show::after { translate: 120% 0; transition: translate 1.1s ease-out .45s; }
+.tr-img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 3px solid var(--tc); background: #fff; }
+.tr-text { min-width: 0; }
+.tr-kind { display: flex; align-items: center; gap: 6px; color: var(--tc); font-family: var(--font-body); font-size: 11.5px; letter-spacing: .03em; text-transform: uppercase; }
+.tr-kind svg { flex: none; width: 14px; height: 14px; }
+.tr-title { margin-top: 2px; font-family: var(--font-display); font-weight: 500; font-size: 19px; line-height: 1.15; }
+.tr-desc { margin-top: 2px; font-family: var(--font-body); font-size: 13px; line-height: 1.4; color: rgba(255, 255, 255, .78); }
+
+/* =====================================================================
+   Cabecinha pixelada escondida no fundo "Windows" (leva à página 404)
+   ===================================================================== */
+.pixel-kin { position: absolute; z-index: 1; display: block; width: 40px; padding: 6px; opacity: .24; transition: opacity .3s; cursor: default; -webkit-tap-highlight-color: transparent; }
+.pixel-kin img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.pixel-kin:hover { opacity: .6; }
+@media (max-width: 760px) { .pixel-kin { width: 36px; } }
+
+/* =====================================================================
+   Página 404
+   ===================================================================== */
+.nf-stage { min-height: 100vh; min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: url('assets/bliss.webp') center / cover no-repeat, linear-gradient(#5ea8ee 0 55%, #4f9a2c 55%); }
+.nf-window { width: min(100%, 520px); background: #fff; border: 3px solid var(--ink); border-radius: 18px; box-shadow: 8px 8px 0 var(--ink); overflow: hidden; }
+.nf-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px 8px 18px; background: var(--red); color: #fff; border-bottom: 3px solid var(--ink); font-family: var(--font-display); font-size: 18px; }
+.nf-x { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 2px solid var(--ink); background: #fff; color: var(--red); font-size: 22px; line-height: 1; text-decoration: none; transition: background .2s, color .2s; }
+.nf-x:hover { background: var(--ink); color: #fff; }
+.nf-body { padding: 26px 28px 32px; text-align: center; }
+.nf-art { display: block; width: min(250px, 62%); height: auto; margin: 0 auto 10px; image-rendering: pixelated; }
+.nf-body h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(24px, 4.4vw, 32px); line-height: 1.15; color: var(--red); }
+.nf-body p { max-width: 38ch; margin: 12px auto 24px; font-family: var(--font-body); font-size: 16px; line-height: 1.6; color: var(--dark); }
+.nf-btn { display: inline-block; padding: 12px 28px; border: 3px solid var(--ink); border-radius: 999px; background: var(--red); color: #fff; font-family: var(--font-display); font-size: 20px; text-decoration: none; box-shadow: 4px 4px 0 var(--ink); transition: translate .2s, box-shadow .2s; }
+.nf-btn:hover { translate: 2px 2px; box-shadow: 2px 2px 0 var(--ink); }
