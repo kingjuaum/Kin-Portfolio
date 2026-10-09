@@ -11,10 +11,10 @@
    ===================================================================== */
 const CONTENT = {
   'home-longos': [ { youtube: '2fXMITWJsYU', thumb: '', title: 'Video 2' }, { youtube: 'geeIieObAyY', thumb: '', title: 'Video 1' }, { youtube: 'yAhCQgp-two', thumb: '', title: 'Video 3' } ],
-  'home-curtos': [ { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 1' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 2' }, { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 3' } ],
+  'home-curtos': [ { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 1' }, { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 2' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 3' } ],
   longos: ['_F1QO28zyuQ', 'PIPRP-wYqUs', '2fXMITWJsYU', 'yAhCQgp-two', 'uSbEdqzeVwA', 'PKKpR2hgVmM']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
-  curtos: ['c1bmlTtrYv8', 'F9GNgwOAREg', 'bIKyqQmvj1Y', 'RxvgWMx4kLw', '4lkBaCZFCPo', '55mLGlL2gaQ']
+  curtos: ['bIKyqQmvj1Y', 'c1bmlTtrYv8', 'F9GNgwOAREg', 'RxvgWMx4kLw', '4lkBaCZFCPo', '55mLGlL2gaQ']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
   outros: ['bhpDx25A4EE', 'Scsorm5a4c4', 'blzK2CbFfXI', 'ThSuYlbClqY']
     .map((youtube, i) => ({ youtube, image: '', thumb: '', title: 'Trabalho ' + (i + 1) }))
@@ -89,7 +89,7 @@ const INFO = {
   },
 
   /* ---------------------------- Vídeos curtos ---------------------------- */
-  'c1bmlTtrYv8': {
+  'bIKyqQmvj1Y': {
     pt: { title: 'Abrindo a box da Sylveon da coleção de 30 anos de Pokémon TCG',
           desc: 'Short para o Instagram e o TikTok abrindo um produto da coleção de 30 anos de Pokémon.',
           role: 'Do roteiro à edição final' },
@@ -97,7 +97,7 @@ const INFO = {
           desc: 'A short for Instagram and TikTok, opening a product from the Pokémon 30th anniversary collection.',
           role: 'From script to final edit' }
   },
-  'F9GNgwOAREg': {
+  'c1bmlTtrYv8': {
     pt: { title: 'Dois idiotas presos em uma pousada do djabo',
           desc: 'Short para o Instagram e o TikTok feito a partir de uma live de “Fears to Fathom” na minha Twitch. Separei alguns trechos e montei uma edição dinâmica e bem-humorada.',
           role: 'Do roteiro à edição final' },
@@ -105,7 +105,7 @@ const INFO = {
           desc: 'A short for Instagram and TikTok made from a “Fears to Fathom” livestream on my Twitch. I picked a few moments from the stream and cut them into a dynamic, funny edit.',
           role: 'From script to final edit' }
   },
-  'bIKyqQmvj1Y': {
+  'F9GNgwOAREg': {
     pt: { title: 'Se você teve um Nintendo Wii, provavelmente já jogou esses jogos',
           desc: 'Short para o Instagram e o TikTok feito para relembrar alguns dos jogos do Nintendo Wii que mais marcaram quem teve (ou ainda tem) o console.',
           role: 'Do roteiro à edição final' },
