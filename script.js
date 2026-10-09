@@ -11,7 +11,7 @@
    ===================================================================== */
 const CONTENT = {
   'home-longos': [ { youtube: '2fXMITWJsYU', thumb: '', title: 'Video 2' }, { youtube: 'geeIieObAyY', thumb: '', title: 'Video 1' }, { youtube: 'yAhCQgp-two', thumb: '', title: 'Video 3' } ],
-  'home-curtos': [ { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 3' }, { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 1' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 2' } ],
+  'home-curtos': [ { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 1' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 2' }, { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 3' } ],
   longos: ['_F1QO28zyuQ', 'PIPRP-wYqUs', '2fXMITWJsYU', 'yAhCQgp-two', 'uSbEdqzeVwA', 'PKKpR2hgVmM']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
   curtos: ['c1bmlTtrYv8', 'F9GNgwOAREg', 'bIKyqQmvj1Y', 'RxvgWMx4kLw', '4lkBaCZFCPo', '55mLGlL2gaQ']
