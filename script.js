@@ -715,11 +715,27 @@ function initFooterTalk() {
 function initSecrets() {
   const seq = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   let pos = 0;
-  document.addEventListener('keydown', e => {
-    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+  const feed = k => {
     pos = (k === seq[pos]) ? pos + 1 : (k === seq[0] ? 1 : 0);
     if (pos === seq.length) { pos = 0; kinRain(); kinUnlock('konami'); }
-  });
+  };
+  document.addEventListener('keydown', e => feed(e.key.length === 1 ? e.key.toLowerCase() : e.key));
+  // No celular: deslizar (cima, cima, baixo, baixo, esquerda, direita, esquerda, direita) e depois tocar duas vezes (B, A)
+  let tx = 0, ty = 0, tid = null;
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1) { tid = null; return; }
+    const t = e.touches[0]; tx = t.clientX; ty = t.clientY; tid = t.identifier;
+  }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (tid === null) return;
+    const t = Array.from(e.changedTouches).find(c => c.identifier === tid);
+    tid = null;
+    if (!t) return;
+    const dx = t.clientX - tx, dy = t.clientY - ty, ax = Math.abs(dx), ay = Math.abs(dy);
+    if (Math.max(ax, ay) < 14) { feed(pos === 8 ? 'b' : pos === 9 ? 'a' : 'tap'); return; }
+    if (Math.max(ax, ay) < 48) return;
+    feed(ax > ay ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : (dy > 0 ? 'ArrowDown' : 'ArrowUp'));
+  }, { passive: true });
 
   // logo: 5 cliques seguidos
   const logo = $('.logo');
@@ -914,6 +930,9 @@ const ACH = {
   lost:     { tier: 'silver', img: 'av-pixel',
               pt: { t: 'Perdido na rede', d: 'Você caiu na página 404. O Kin finge que não viu.' },
               en: { t: 'Lost online', d: 'You landed on the 404 page. Kin pretends he didn\'t see.' } },
+  arcade:   { tier: 'silver', img: 'av-pixel',
+              pt: { t: 'Fugitivo do 404', d: 'Você chegou a 150 pontos no minigame secreto da página 404.' },
+              en: { t: '404 fugitive', d: 'You reached 150 points in the secret minigame on the 404 page.' } },
   konami:   { tier: 'gold', img: 'av-real',
               pt: { t: 'Modo Kin', d: 'Você digitou o código secreto. Chuva de cabeças liberada!' },
               en: { t: 'Kin mode', d: 'You typed the secret code. Head rain unlocked!' } }
@@ -942,6 +961,7 @@ function kinUnlock(id) {
   const giveGold = all && !have.includes('platinum');
   if (giveGold) { have.push('platinum'); trophyMem.add('platinum'); }
   store(TROPHY_KEY, JSON.stringify(have));
+  updateTrophyBtn();
   queueTrophy(id, done, ids.length);
   if (giveGold) queueTrophy('platinum', done, ids.length);
   return true;
@@ -981,6 +1001,113 @@ function nextTrophy() {
   }, plat ? 6500 : 4800);
 }
 
+/* =====================================================================
+   GALERIA DE CONQUISTAS — botão discreto no rodapé; os troféus que
+   ainda não foram achados ficam misteriosos (só uma pista enigmática)
+   ===================================================================== */
+const GAL = {
+  pt: { open: 'Ver conquistas', title: 'Conquistas', close: 'Fechar',
+        sub: 'Segredos escondidos pelo site. Os que você ainda não achou ficam misteriosos.',
+        all: 'Você achou tudo. Obrigado por explorar cada cantinho!',
+        tier: { bronze: 'Bronze', silver: 'Prata', gold: 'Ouro', platinum: 'Platina' } },
+  en: { open: 'View achievements', title: 'Achievements', close: 'Close',
+        sub: 'Secrets hidden around the site. The ones you haven\'t found yet stay mysterious.',
+        all: 'You found everything. Thanks for exploring every corner!',
+        tier: { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum' } }
+};
+const HINTS = {
+  logo:     { pt: 'Algo no topo da Home reage a quem insiste.', en: 'Something at the top of the Home page reacts to persistence.' },
+  faces:    { pt: 'A faixa vermelha tem carinhas curiosas.', en: 'The red strip is full of curious little faces.' },
+  portrait: { pt: 'Toda foto tem uma história por trás.', en: 'Every photo has a story behind it.' },
+  footL:    { pt: 'No rodapé, alguém quer te cumprimentar.', en: 'In the footer, someone wants to greet you.' },
+  footR:    { pt: 'O outro lado do rodapé também tem o que dizer.', en: 'The other side of the footer has something to say too.' },
+  poke:     { pt: 'Alguém na Home tem pouca paciência.', en: 'Someone on the Home page has little patience.' },
+  lost:     { pt: 'Nem todo caminho leva a uma página que existe.', en: 'Not every path leads to a page that exists.' },
+  arcade:   { pt: 'Quando a página some, às vezes sobra uma corrida.', en: 'When the page vanishes, sometimes a race is all that is left.' },
+  konami:   { pt: 'Quem joga há muito tempo conhece esta sequência. No celular, vale deslizar o dedo.', en: 'Longtime gamers know this sequence. On a phone, try swiping.' },
+  platinum: { pt: 'Encontre todos os segredos.', en: 'Find all the secrets.' }
+};
+const GAL_ORDER = ['logo', 'faces', 'portrait', 'footL', 'footR', 'poke', 'lost', 'arcade', 'konami'];
+
+function trophyCount() { const have = trophyList(); return GAL_ORDER.filter(k => have.includes(k)).length; }
+function updateTrophyBtn() {
+  const b = $('.trophy-open');
+  if (!b) return;
+  const n = trophyCount(), total = GAL_ORDER.length;
+  $('span', b).textContent = n + '/' + total;
+  b.setAttribute('aria-label', GAL[curLang()].open + ' (' + n + '/' + total + ')');
+  b.classList.toggle('plat', trophyList().includes('platinum'));
+}
+function renderGallery(g) {
+  const lang = curLang(), T = GAL[lang], have = trophyList(), n = trophyCount(), total = GAL_ORDER.length;
+  $('.tg-title', g).textContent = T.title;
+  $('.tg-close', g).setAttribute('aria-label', T.close);
+  $('.tg-sub', g).textContent = n === total ? T.all : T.sub;
+  $('.tg-count', g).textContent = n + ' / ' + total;
+  $('.tg-fill', g).style.width = Math.round(n / total * 100) + '%';
+  const list = $('.tg-list', g);
+  list.textContent = '';
+  const addCard = (id, tier, def) => {
+    const on = have.includes(id);
+    const card = document.createElement('div');
+    card.className = 'tg-card ' + tier + (on ? ' on' : ' locked');
+    const pic = on ? document.createElement('img') : document.createElement('div');
+    pic.className = 'tg-img' + (on ? '' : ' q');
+    if (on) { pic.alt = ''; pic.width = 56; pic.height = 56; pic.src = 'assets/' + def.img + '.webp'; } else pic.textContent = '?';
+    const box = document.createElement('div');
+    const kind = document.createElement('div'); kind.className = 'tg-kind';
+    kind.textContent = on ? TIER_LABEL[lang][tier] : T.tier[tier];
+    const name = document.createElement('div'); name.className = 'tg-name';
+    const desc = document.createElement('div'); desc.className = 'tg-desc';
+    if (on) { const txt = def[lang] || def.pt; name.textContent = txt.t; desc.textContent = txt.d; }
+    else { name.textContent = '???'; desc.textContent = HINTS[id][lang]; }
+    box.append(kind, name, desc);
+    card.append(pic, box);
+    list.appendChild(card);
+  };
+  addCard('platinum', 'platinum', PLATINUM);
+  GAL_ORDER.forEach(id => addCard(id, ACH[id].tier, ACH[id]));
+}
+let galleryFocus = null;
+function closeGallery() {
+  const g = $('#trophy-gallery');
+  if (!g || !g.classList.contains('open')) return;
+  g.classList.remove('open');
+  if (galleryFocus) galleryFocus.focus();
+}
+function openGallery() {
+  let g = $('#trophy-gallery');
+  if (!g) {
+    g = document.createElement('div');
+    g.id = 'trophy-gallery'; g.className = 'tg'; g.setAttribute('role', 'dialog'); g.setAttribute('aria-modal', 'true');
+    g.innerHTML = '<div class="tg-panel"><button type="button" class="tg-close">×</button><h2 class="tg-title"></h2><p class="tg-sub"></p>'
+      + '<div class="tg-bar"><div class="tg-fill"></div></div><p class="tg-count"></p><div class="tg-list"></div></div>';
+    document.body.appendChild(g);
+    g.addEventListener('click', e => { if (e.target === g || e.target.closest('.tg-close')) closeGallery(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGallery(); });
+  }
+  renderGallery(g);
+  galleryFocus = document.activeElement;
+  g.classList.add('open');
+  $('.tg-close', g).focus();
+}
+function initTrophyButton() {
+  const host = $('.footer-inner');
+  if (!host) return;
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'trophy-open';
+  b.innerHTML = TROPHY_SVG + '<span></span>';
+  host.appendChild(b);
+  b.addEventListener('click', openGallery);
+  updateTrophyBtn();
+  // troca de idioma: atualiza o botão e a galeria aberta
+  new MutationObserver(() => {
+    updateTrophyBtn();
+    const g = $('#trophy-gallery');
+    if (g && g.classList.contains('open')) renderGallery(g);
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+}
+
 /* ================================ Init ============================= */
 document.addEventListener('DOMContentLoaded', () => {
   $$('img').forEach(img => { if (img.complete && img.naturalWidth === 0) tryNextExt(img); });
@@ -997,6 +1124,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPoke();
   initFooterTalk();
   initSecrets();
+  initTrophyButton();
   $$('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
   setLang(store('lang') === 'en' ? 'en' : 'pt');
 });
