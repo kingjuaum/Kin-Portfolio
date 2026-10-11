@@ -5,10 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>404 — Página não encontrada | João Vitor</title>
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#cd0024">
+<meta name="theme-color" content="#f7f7f7">
 <script>
-/* Esta página é servida em qualquer endereço que não existe, então os caminhos precisam ser absolutos.
-   No GitHub Pages (https://usuario.github.io/repositorio/) a base é /repositorio/. */
 (function () {
   if (location.protocol === 'file:') return;
   var seg = location.pathname.split('/')[1];
@@ -26,16 +24,15 @@ document.documentElement.classList.add('js');
 <link rel="stylesheet" href="style.css">
 </head>
 <body class="nf">
-<main class="nf-stage">
-  <div class="nf-window">
-    <div class="nf-bar"><span data-i18n="nf_bar">Erro 404</span><a class="nf-x" href="index.html" aria-label="Fechar e voltar ao início">×</a></div>
-    <div class="nf-body">
-      <img class="nf-art" src="assets/404-kin.webp" alt="Cabeça pixelada do Kin com a mensagem 404 not found" width="380" height="298">
-      <h1 data-i18n="nf_title">Opa! Essa página não existe.</h1>
-      <p data-i18n="nf_text">O Kin procurou em todo canto e não achou nada. O link pode estar errado, ou a página se perdeu no meio de um render.</p>
-      <a class="nf-btn" href="index.html" data-i18n="nf_btn">Voltar para o início</a>
-    </div>
-  </div>
+<a class="skip-link" href="#conteudo" data-i18n="skip">Pular para o conteúdo</a>
+<main class="nf-stage" id="conteudo" tabindex="-1">
+  <section class="nf-main">
+    <img class="nf-art" src="assets/404-kin.webp" alt="Cabeça pixelada do Kin ao lado da mensagem 404 not found" width="380" height="298">
+    <h1 data-i18n="nf_title">Opa! Essa página não existe.</h1>
+    <p data-i18n="nf_text">O Kin procurou em todo canto e não achou nada. O link pode estar errado, ou a página se perdeu no meio de um render.</p>
+    <a class="nf-btn" href="index.html" data-i18n="nf_btn">Voltar para o início</a>
+    <nav class="nf-links" aria-label="Páginas do site"><a href="longos.html" data-i18n="nav_long">Vídeos longos</a><a href="curtos.html" data-i18n="nav_short">Vídeos curtos</a><a href="outros.html" data-i18n="nav_other">Outros</a></nav>
+  </section>
 </main>
 <script src="script.js"></script>
 <script src="arcade.js"></script>

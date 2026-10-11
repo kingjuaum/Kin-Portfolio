@@ -1,14 +1,4 @@
-/* =====================================================================
-   CONFIGURAÇÃO DOS VÍDEOS  —  é aqui que você coloca seu conteúdo
-   ---------------------------------------------------------------------
-   Para cada item preencha:
-     youtube: o ID do vídeo (a parte depois de "v=" no link do YouTube,
-              ou depois de "youtu.be/" / "shorts/")
-     thumb:   (opcional) caminho de uma imagem de capa, ex: 'assets/capa1.jpg'
-     title:   (opcional) legenda que aparece no cartão
-   Na página "Outros", em vez de youtube você pode usar  image: 'assets/x.jpg'
-   (é o que abre quando clica numa pasta).
-   ===================================================================== */
+/* ========== Configuração dos vídeos ========== */
 const CONTENT = {
   'home-longos': [ { youtube: '2fXMITWJsYU', thumb: '', title: 'Video 2' }, { youtube: 'geeIieObAyY', thumb: '', title: 'Video 1' }, { youtube: 'yAhCQgp-two', thumb: '', title: 'Video 3' } ],
   'home-curtos': [ { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 1' }, { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 2' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 3' } ],
@@ -20,17 +10,9 @@ const CONTENT = {
     .map((youtube, i) => ({ youtube, image: '', thumb: '', title: 'Trabalho ' + (i + 1) }))
 };
 
-/* =====================================================================
-   DESCRIÇÕES DOS PROJETOS  —  aparecem ao lado do vídeo quando ele é aberto
-   ---------------------------------------------------------------------
-   A chave é o ID do YouTube do vídeo. Como o mesmo vídeo pode aparecer na Home
-   e na aba dele, a descrição é escrita uma vez só e vale para os dois lugares.
-   Para cada vídeo: title (título), desc (resumo) e role (o que você fez),
-   em português (pt) e em inglês (en).
-   Vídeo sem entrada aqui abre só o player, como antes.
-   ===================================================================== */
+/* ========== Descrições dos projetos ========== */
 const INFO = {
-  /* ---------------------------- Vídeos longos ---------------------------- */
+  /* ========== Vídeos longos ========== */
   'geeIieObAyY': {
     pt: { title: 'Stream Pack',
           desc: 'Overlays de início e fim de stream que criei para as minhas lives. Animei a cabeça no After Effects e montei o restante da composição no Premiere.',
@@ -88,7 +70,7 @@ const INFO = {
           role: 'From script to final edit' }
   },
 
-  /* ---------------------------- Vídeos curtos ---------------------------- */
+  /* ========== Vídeos curtos ========== */
   'bIKyqQmvj1Y': {
     pt: { title: 'Abrindo a box da Sylveon da coleção de 30 anos de Pokémon TCG',
           desc: 'Short para o Instagram e o TikTok abrindo um produto da coleção de 30 anos de Pokémon.',
@@ -138,7 +120,7 @@ const INFO = {
           role: 'From script to final edit' }
   },
 
-  /* ------------------------------- Outros -------------------------------- */
+  /* ========== Outros ========== */
   'bhpDx25A4EE': {
     pt: { title: 'Motion de final de vídeo',
           desc: 'Motion simples criado no After Effects para ser usado no final de vídeos.',
@@ -173,12 +155,12 @@ const INFO = {
   }
 };
 
-/* ============================ Idiomas ============================ */
+/* ========== Idiomas ========== */
 const EN = {
   nav_long: 'Long videos', nav_short: 'Short videos', nav_other: 'Others', nav_contact: 'Contact',
   hero_hi: "Hi, I'm Kin!", btn_talk: "Let's talk", btn_projects: 'See projects',
   svc_edit: 'Video Editing', svc_motion: 'Motion Design', svc_film: 'Video Making',
-    nf_bar: 'Error 404', nf_title: 'Oops! This page doesn\'t exist.', nf_text: 'Kin looked everywhere and found nothing. The link may be wrong, or the page got lost in the middle of a render.', nf_btn: 'Back to home',
+    skip: 'Skip to content', nf_title: 'Oops! This page doesn\'t exist.', nf_text: 'Kin looked everywhere and found nothing. The link may be wrong, or the page got lost in the middle of a render.', nf_btn: 'Back to home',
   works: 'Works', long_label: 'Long Videos', short_label: 'Short Videos',
   title_long: 'Long Videos', title_short: 'Short Videos', title_other: 'Other Works',
   about: 'About me',
@@ -196,7 +178,7 @@ function store(k, v) { try { if (v === undefined) return localStorage.getItem(k)
 
 function setLang(lang) {
   $$('[data-i18n]').forEach(el => {
-    const isHtml = el.hasAttribute('data-html');   // textos com <strong> precisam de innerHTML
+    const isHtml = el.hasAttribute('data-html');
     if (el.dataset.pt === undefined) el.dataset.pt = isHtml ? el.innerHTML : el.textContent;
     const txt = lang === 'en' ? (EN[el.dataset.i18n] || el.dataset.pt) : el.dataset.pt;
     if (isHtml) el.innerHTML = txt; else el.textContent = txt;
@@ -207,7 +189,7 @@ function setLang(lang) {
   store('lang', lang);
 }
 
-/* ===== Aceita imagens em .png, .jpg, .jpeg ou .webp com o mesmo nome ===== */
+/* ========== Imagens ========== */
 const IMG_EXTS = ['png', 'jpg', 'jpeg', 'webp'];
 function tryNextExt(img) {
   const m = (img.getAttribute('src') || '').match(/^(assets\/[^?#]+)\.(\w+)$/i);
@@ -220,7 +202,6 @@ function tryNextExt(img) {
 }
 document.addEventListener('error', e => { if (e.target instanceof HTMLImageElement) tryNextExt(e.target); }, true);
 
-/* Descrição do projeto no idioma atual (ou null se o vídeo não tiver) */
 function infoFor(item) {
   const e = item && item.youtube && INFO[item.youtube];
   if (!e) return null;
@@ -229,30 +210,72 @@ function infoFor(item) {
 
 const ytThumb = (id, quality) => 'https://i.ytimg.com/vi/' + id + '/' + quality + '.jpg';
 
-/* ========================= Cartões de vídeo ======================== */
+/* ========== Cartões de vídeo ========== */
+function cardTitle(item) {
+  const info = infoFor(item);
+  return (info && info.title) || item.title || '';
+}
+
 function fillCards() {
   $$('.video-card').forEach(card => {
     const item = (CONTENT[card.dataset.group] || [])[+card.dataset.index];
     if (!item) return;
-    // Capa: usa a sua (thumb) ou pega automaticamente a capa do vídeo no YouTube
     const src = item.thumb || (item.youtube ? ytThumb(item.youtube, 'maxresdefault') : '');
     if (src) {
       const img = document.createElement('img');
       img.className = 'thumb'; img.src = src; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
-      if (!item.thumb && item.youtube) {
-        img.addEventListener('error', () => { img.src = ytThumb(item.youtube, 'hqdefault'); }, { once: true });
-      }
+      img.addEventListener('error', () => {
+        if (!item.thumb && item.youtube && !img.dataset.fallback) { img.dataset.fallback = '1'; img.src = ytThumb(item.youtube, 'hqdefault'); }
+        else { img.remove(); card.classList.add('no-thumb'); }
+      });
       card.prepend(img);
-    }
-    const info = infoFor(item);
-    card.setAttribute('aria-label', (info && info.title) || item.title || 'Abrir vídeo');
+    } else card.classList.add('no-thumb');
+    const cap = document.createElement('span');
+    cap.className = 'cap'; cap.setAttribute('aria-hidden', 'true'); cap.textContent = cardTitle(item);
+    card.append(cap);
+    card.setAttribute('aria-label', cardTitle(item) || 'Abrir vídeo');
     card.addEventListener('click', () => openItem(card.dataset.group, +card.dataset.index));
+  });
+  new MutationObserver(() => {
+    $$('.video-card').forEach(card => {
+      const item = (CONTENT[card.dataset.group] || [])[+card.dataset.index];
+      if (!item) return;
+      const t = cardTitle(item), cap = $('.cap', card);
+      if (cap) cap.textContent = t;
+      card.setAttribute('aria-label', t || 'Abrir vídeo');
+    });
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+}
+
+/* ========== Modal ========== */
+let lastFocus = null;
+let modalCurrent = null;
+let modalHistory = false;
+let skipPush = false;
+
+function focusables(root) {
+  return Array.from(root.querySelectorAll('button, a[href], iframe, [tabindex]:not([tabindex="-1"])'))
+    .filter(el => !el.disabled && el.getClientRects().length > 0);
+}
+function trapTab(e, root) {
+  const list = focusables(root);
+  if (!list.length) return;
+  const first = list[0], last = list[list.length - 1];
+  if (e.shiftKey && (document.activeElement === first || !root.contains(document.activeElement))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).then(() => true, () => false);
+  return new Promise(resolve => {
+    const t = document.createElement('textarea');
+    t.value = text; t.setAttribute('readonly', ''); t.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
+    document.body.appendChild(t); t.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    t.remove(); resolve(ok);
   });
 }
 
-/* =============================== Modal ============================= */
-let lastFocus = null;
-let modalCurrent = null;   // { group, index } do vídeo que está aberto
 function modalEl() {
   let m = $('#modal');
   if (m) return m;
@@ -273,18 +296,22 @@ function modalEl() {
     if (e.key === 'Escape') closeModal();
     else if (e.key === 'ArrowRight') stepModal(1);
     else if (e.key === 'ArrowLeft') stepModal(-1);
+    else if (e.key === 'Tab') trapTab(e, m);
   });
+  window.addEventListener('popstate', () => { if (m.classList.contains('open')) closeModal(true); });
   return m;
 }
-function closeModal() {
+function closeModal(fromPop) {
   const m = $('#modal');
   if (!m || !m.classList.contains('open')) return;
   m.classList.remove('open');
   modalCurrent = null;
   $('.modal-content', m).innerHTML = '';
   if (lastFocus) lastFocus.focus();
+  if (fromPop === true) { modalHistory = false; return; }
+  if (modalHistory) { modalHistory = false; history.back(); }
+  else if (/^#v=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
 }
-/* Ordem dos vídeos = a ordem em que os cartões aparecem na tela */
 function modalOrder(group) {
   return $$('.video-card[data-group="' + group + '"]').map(c => +c.dataset.index).filter(i => (CONTENT[group] || [])[i]);
 }
@@ -301,14 +328,26 @@ function updateModalNav(m, group, index) {
   m.classList.toggle('has-nav', order.length > 1 && i >= 0);
   $('.modal-nav.prev', m).setAttribute('aria-label', en ? 'Previous video' : 'Vídeo anterior');
   $('.modal-nav.next', m).setAttribute('aria-label', en ? 'Next video' : 'Próximo vídeo');
+  $('.modal-close', m).setAttribute('aria-label', en ? 'Close' : 'Fechar');
   $('.modal-count', m).textContent = i >= 0 ? (i + 1) + ' / ' + order.length : '';
 }
+function openFromHash() {
+  const h = location.hash.match(/^#v=([\w-]{11})$/);
+  if (!h) return;
+  for (const g of Object.keys(CONTENT)) {
+    const i = CONTENT[g].findIndex(it => it.youtube === h[1]);
+    if (i >= 0 && $('.video-card[data-group="' + g + '"][data-index="' + i + '"]')) {
+      skipPush = true; openItem(g, i); skipPush = false;
+      return;
+    }
+  }
+}
+
+window.addEventListener('hashchange', () => { if (/^#v=/.test(location.hash) && !$('#modal.open')) openFromHash(); });
+
 function openItem(group, index) {
   const item = (CONTENT[group] || [])[index];
   const vertical = group.endsWith('curtos');
-  /* Abrindo o arquivo direto do computador (file://), o YouTube recusa o player embutido
-     (erro 153). Nesse caso abrimos o vídeo no próprio YouTube, em outra aba.
-     Quando o site estiver hospedado (https://), o player aparece normalmente aqui dentro. */
   if (item && item.youtube && location.protocol === 'file:') {
     window.open('https://www.youtube.com/watch?v=' + encodeURIComponent(item.youtube), '_blank', 'noopener');
     return;
@@ -321,7 +360,6 @@ function openItem(group, index) {
   box.classList.toggle('vertical', vertical);
   box.classList.toggle('has-info', !!(info && item.youtube));
   if (info && item.youtube) {
-    // Vídeo + descrição do projeto ao lado (no celular, a descrição vem embaixo)
     content.style.cssText = '';
     content.textContent = '';
     const mv = document.createElement('div'); mv.className = 'mv'; mv.innerHTML = player();
@@ -334,6 +372,17 @@ function openItem(group, index) {
       const b = document.createElement('strong'); b.textContent = (lang === 'en' ? 'My role' : 'Meu papel') + ': ';
       r.append(b, info.role); mi.append(r);
     }
+    const cp = document.createElement('button');
+    cp.type = 'button'; cp.className = 'mi-copy';
+    const label = lang === 'en' ? 'Copy link' : 'Copiar link';
+    cp.textContent = label;
+    cp.addEventListener('click', () => {
+      copyText(location.origin + location.pathname + '#v=' + item.youtube).then(ok => {
+        cp.textContent = ok ? (lang === 'en' ? 'Link copied!' : 'Link copiado!') : (lang === 'en' ? 'Could not copy' : 'Não foi possível copiar');
+        setTimeout(() => { cp.textContent = label; }, 2200);
+      });
+    });
+    mi.append(cp);
     content.append(mv, mi);
     m.setAttribute('aria-label', info.title);
   } else {
@@ -354,9 +403,15 @@ function openItem(group, index) {
   m.scrollTop = 0;
   m.classList.add('open');
   if (!wasOpen) $('.modal-close', m).focus();
+  if (item && item.youtube && !skipPush) {
+    try {
+      const st = { kinModal: 1 }, url = '#v=' + item.youtube;
+      if (modalHistory) history.replaceState(st, '', url);
+      else { history.pushState(st, '', url); modalHistory = true; }
+    } catch (e) { modalHistory = false; }
+  }
 }
 
-/* ====== Ícones flutuantes do hero: levam a um vídeo da página ====== */
 function wireHeroIcons() {
   $$('.hero-icon').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -368,7 +423,7 @@ function wireHeroIcons() {
   });
 }
 
-/* ===================== Animação: revelar ao rolar ================== */
+/* ========== Revelar ao rolar ========== */
 function initReveal() {
   const els = $$('.reveal, .reveal-zoom, .reveal-line');
   $$('[data-stagger]').forEach(group => {
@@ -382,11 +437,11 @@ function initReveal() {
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
   els.forEach(el => io.observe(el));
-  // Garantia: se algo não for revelado em 5s (ex.: aba em segundo plano), mostra tudo
+
   setTimeout(() => els.forEach(el => el.classList.add('in')), 5000);
 }
 
-/* ======= Header: sombra ao rolar, barra de progresso e menu mobile ====== */
+/* ========== Header ========== */
 function initHeader() {
   const header = $('.site-header'), bar = $('.progress'), toggle = $('.menu-toggle');
   if (!header) return;
@@ -406,9 +461,9 @@ function initHeader() {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
 }
 
-/* ============ Parallax suave do mascote (só com mouse) ============ */
+/* ========== Parallax do mascote ========== */
 function initParallax() {
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches || matchMedia('(pointer: coarse)').matches) return;
+  if (REDUCE || matchMedia('(pointer: coarse)').matches) return;
   $$('.hero').forEach(hero => {
     const m = $('.hero-mascot', hero);
     if (!m) return;
@@ -422,7 +477,7 @@ function initParallax() {
   });
 }
 
-/* ============ Transição suave ao trocar de página ============ */
+/* ========== Transição de página ========== */
 function initTransitions() {
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href]');
@@ -437,16 +492,14 @@ function initTransitions() {
   window.addEventListener('pageshow', () => document.body.classList.remove('leaving'));
 }
 
-/* =====================================================================
-   EFEITOS EXTRAS: grade animada, cursor, tilt, easter eggs
-   ===================================================================== */
+/* ========== Efeitos extras ========== */
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-/* Computador mais fraco (poucos núcleos / pouca memória): o site usa efeitos mais leves automaticamente */
+
 const WEAK = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4;
 const FINE_POINTER = matchMedia('(pointer: fine)').matches;
 const curLang = () => document.documentElement.dataset.lang === 'en' ? 'en' : 'pt';
 
-/* ---------- Grade preta animada no fundo branco da Home ---------- */
+/* ========== Grade animada ========== */
 function initGrid() {
   const hero = $('.home-hero');
   if (!hero) return;
@@ -458,7 +511,7 @@ function initGrid() {
   if (!ctx) return;
 
   let W = 0, H = 0, u = 1, cell = 56, cols = 0, rows = 0, ox = 0, oy = 0, raf = 0, visible = true;
-  let level = 0, slow = 0, ema = 0, lastAct = 0, lastDraw = 0;  // 'level' sobe sozinho se o computador estiver sofrendo
+  let level = 0, slow = 0, ema = 0, lastAct = 0, lastDraw = 0;
   let px = new Float32Array(0), py = new Float32Array(0), pa = new Float32Array(0);
   const mouse = { x: 0, y: 0, sx: 0, sy: 0, want: 0, p: 0, speed: 0, ag: 0, lx: null, ly: null };
   const fig = $('.hero-figure', hero);
@@ -492,19 +545,19 @@ function initGrid() {
         const idx = j * cols + i;
         const bx = ox + i * cell, by = oy + j * cell;
         let dx = 0, dy = 0, a = 0;
-        // ondulação suave o tempo todo
+
         const w = Math.sin(bx * 0.011 + t * 0.0011) + Math.cos(by * 0.013 - t * 0.0009);
         dy += w * 2.4; dx += Math.cos((bx + by) * 0.01 + t * 0.0008) * 1.8;
-        // faixa de luz que atravessa a grade na diagonal
+
         let q = (bx * 0.8 + by * 0.6 - t * 0.14) % 2600; if (q < 0) q += 2600; if (q > 1300) q -= 2600;
         a += Math.exp(-(q * q) / 16000) * 0.4;
-        // mouse: a grade "estufa" em volta do cursor
+
         if (mouse.p > 0.01) {
           const mx = bx - mouse.sx, my = by - mouse.sy, d2 = mx * mx + my * my;
           const f = Math.exp(-d2 / R2) * mouse.p, d = Math.sqrt(d2) + 0.001;
           dx += (mx / d) * f * 18; dy += (my / d) * f * 18; a += f * 0.5;
         }
-        // ondas ao clicar
+
         for (let k = 0; k < ripples.length; k++) {
           const r = ripples[k], age = now - r.t0;
           const rx = bx - r.x, ry = by - r.y, d = Math.sqrt(rx * rx + ry * ry) + 0.001;
@@ -515,8 +568,6 @@ function initGrid() {
       }
     }
 
-    // Estilo "cartoon": traço grosso e arredondado, levemente torto (como desenhado à mão),
-    // que "ferve" em passos curtos. Desenhado em lotes para ficar leve.
     const NB = 8, lines = [], dots = [];
     for (let k = 0; k < NB; k++) { lines.push(new Path2D()); dots.push(new Path2D()); }
     const bucket = al => Math.min(NB - 1, Math.max(0, Math.round((al - 0.1) * (NB - 1) / 0.75)));
@@ -541,19 +592,19 @@ function initGrid() {
     }
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     for (let k = 0; k < NB; k++) {
-      // opacidade baixa (0.04 a 0.17) para a grade ficar de fundo e não competir com o texto
+
       const al = 0.04 + k * 0.13 / (NB - 1);
       ctx.lineWidth = (2.2 + k * 0.22) * u;
       ctx.strokeStyle = 'rgba(43,40,47,' + al.toFixed(3) + ')'; ctx.stroke(lines[k]);
       ctx.fillStyle = 'rgba(43,40,47,' + Math.min(0.22, al + 0.03).toFixed(3) + ')'; ctx.fill(dots[k]);
     }
-    // esmaece a grade na borda de baixo (sem máscara CSS, que é pesada)
+
     ctx.globalCompositeOperation = 'destination-out';
     const g = ctx.createLinearGradient(0, H * 0.78, 0, H);
     g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,1)');
     ctx.fillStyle = g; ctx.fillRect(0, H * 0.78, W, H * 0.22);
     ctx.globalCompositeOperation = 'source-over';
-    // O Kin só se mexe quando a grade é "chacoalhada" (mouse rápido) ou quando clicam
+
     mouse.speed *= 0.9;
     const target = Math.min(Math.max((mouse.speed - 260) / 520, 0), 1);
     mouse.ag += (target - mouse.ag) * (target > mouse.ag ? 0.12 : 0.05);
@@ -571,14 +622,14 @@ function initGrid() {
     raf = 0;
     const now = performance.now();
     const active = now - lastAct < 1600 || ripples.length > 0 || mouse.ag > 0.02 || mouse.p > 0.02;
-    // parado: ~24 quadros/s (o visual "cartoon" já é em passos); com interação: ~38. Em PC fraco, menos ainda.
+
     const gap = (active ? 26 : 42) * (WEAK ? 1.6 : 1) * (1 + level * 0.5);
     if (now - lastDraw >= gap) {
       lastDraw = now;
       draw(t);
       const dt = performance.now() - now;
       ema = ema * 0.9 + dt * 0.1;
-      if (ema > 8 && level < 3 && ++slow > 25) { level++; slow = 0; ema = 0; resize(); }   // desenhando devagar: simplifica sozinho
+      if (ema > 8 && level < 3 && ++slow > 25) { level++; slow = 0; ema = 0; resize(); }
     }
     if (visible && !REDUCE && !document.hidden) schedule();
   }
@@ -609,11 +660,11 @@ function initGrid() {
   if ('ResizeObserver' in window) new ResizeObserver(resize).observe(hero); else window.addEventListener('resize', resize);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) schedule(); });
   resize();
-  // sem animação (movimento reduzido): desenha uma vez
+
   if (REDUCE) draw(0);
 }
 
-/* ---------- Cartões de vídeo: inclinação 3D com brilho ---------- */
+/* ========== Inclinação dos cartões ========== */
 function initTilt() {
   if (REDUCE || !FINE_POINTER) return;
   $$('.video-card').forEach(card => {
@@ -629,9 +680,7 @@ function initTilt() {
   });
 }
 
-/* =====================================================================
-   EASTER EGGS
-   ===================================================================== */
+/* ========== Easter eggs ========== */
 function toast(msg) {
   let t = $('.toast');
   if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); }
@@ -641,7 +690,6 @@ function toast(msg) {
   toast.timer = setTimeout(() => t.classList.remove('show'), 3200);
 }
 
-/* Balão de fala reutilizável */
 function sayIn(host, text, cls) {
   let b = $(':scope > .speech', host);
   if (!b) { b = document.createElement('div'); b.className = 'speech'; b.setAttribute('role', 'status'); host.appendChild(b); }
@@ -691,7 +739,6 @@ function initPoke() {
   });
 }
 
-/* Mascotes do rodapé também falam */
 function initFooterTalk() {
   const lines = {
     left: { pt: ['Valeu por passar por aqui! 👋', 'Gostou? Chama no Instagram!', 'Tô aqui o dia todo, pode chamar.'],
@@ -711,7 +758,6 @@ function initFooterTalk() {
   });
 }
 
-/* Konami code e outros segredos */
 function initSecrets() {
   const seq = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   let pos = 0;
@@ -720,7 +766,7 @@ function initSecrets() {
     if (pos === seq.length) { pos = 0; kinRain(); kinUnlock('konami'); }
   };
   document.addEventListener('keydown', e => feed(e.key.length === 1 ? e.key.toLowerCase() : e.key));
-  // No celular: deslizar (cima, cima, baixo, baixo, esquerda, direita, esquerda, direita) e depois tocar duas vezes (B, A)
+
   let tx = 0, ty = 0, tid = null;
   document.addEventListener('touchstart', e => {
     if (e.touches.length !== 1) { tid = null; return; }
@@ -737,7 +783,6 @@ function initSecrets() {
     feed(ax > ay ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : (dy > 0 ? 'ArrowDown' : 'ArrowUp'));
   }, { passive: true });
 
-  // logo: 5 cliques seguidos
   const logo = $('.logo');
   if (logo) {
     let n = 0, timer = 0;
@@ -751,13 +796,11 @@ function initSecrets() {
     });
   }
 
-  // carinhas da faixa vermelha
   $$('.marquee-item .faded').forEach(img => img.addEventListener('click', () => {
     img.classList.remove('popped'); void img.offsetWidth; img.classList.add('popped');
     kinUnlock('faces');
   }));
 
-  // foto do "Sobre mim"
   const p = $('.about .portrait');
   if (p) p.addEventListener('click', () => { if (!kinUnlock('portrait')) toast(curLang() === 'en' ? '📸 Taken at 3 AM, between one render and another.' : '📸 Foto tirada às 3 da manhã, entre um render e outro.'); });
 
@@ -783,12 +826,9 @@ function kinRain() {
   setTimeout(() => layer.remove(), 7000);
 }
 
-
-/* ---------- Ondas de fundo (curvas de nível) ----------
-   Desenhadas por código UMA única vez (e de novo só se a janela mudar de tamanho).
-   O movimento fluido é feito pelo CSS, que roda na placa de vídeo e quase não gasta processador. */
+/* ========== Ondas ========== */
 function initWaves() {
-  // casos do "marching squares": pares de arestas (0 topo, 1 direita, 2 base, 3 esquerda)
+
   const TABLE = [[], [3, 0], [0, 1], [3, 1], [1, 2], [3, 0, 1, 2], [0, 2], [3, 2], [2, 3], [0, 2], [0, 1, 2, 3], [1, 2], [1, 3], [0, 1], [3, 0], []];
 
   function render(canvas, w, h, seed, levels, color, width) {
@@ -850,7 +890,7 @@ function initWaves() {
     };
     if ('ResizeObserver' in window) new ResizeObserver(() => { clearTimeout(timer); timer = setTimeout(build, 200); }).observe(host);
     build();
-    // fora da tela, o movimento pausa (não gasta nada)
+
     if ('IntersectionObserver' in window) new IntersectionObserver(en => wrap.classList.toggle('off', !en[0].isIntersecting)).observe(host);
   }
 
@@ -859,11 +899,9 @@ function initWaves() {
   if (foot) make(foot, { color: 'rgba(255,255,255,0.16)', color2: 'rgba(255,255,255,0.10)', seed: 7.9 });
 }
 
-/* ---------- Fundo das subpáginas: cabeças do Kin flutuando (sem interação) ----------
-   Só imagens com animação de CSS (rodam na placa de vídeo). Posições fixas (sempre iguais),
-   nada de JS por quadro, e o movimento pausa quando a seção sai da tela. */
+/* ========== Cabeças flutuantes ========== */
 function initHeadsBg() {
-  $$('main').forEach(host => {
+  $$('main:not(.nf-stage)').forEach(host => {
     const layer = document.createElement('div');
     layer.className = 'bg-heads'; layer.setAttribute('aria-hidden', 'true');
     host.prepend(layer);
@@ -897,57 +935,53 @@ function initHeadsBg() {
   });
 }
 
-/* =====================================================================
-   CONQUISTAS — troféus estilo PlayStation, um para cada segredo do site
-   O progresso fica salvo no navegador de cada visitante (localStorage).
-   Para testar do zero: localStorage.removeItem('kinTrophies')
-   ===================================================================== */
+/* ========== Conquistas ========== */
 const TROPHY_KEY = 'kinTrophies';
 const TIER_LABEL = {
   pt: { bronze: 'Troféu de bronze', silver: 'Troféu de prata', gold: 'Troféu de ouro', platinum: 'Troféu de platina', done: 'desbloqueado' },
   en: { bronze: 'Bronze trophy', silver: 'Silver trophy', gold: 'Gold trophy', platinum: 'Platinum trophy', done: 'unlocked' }
 };
-/* img = foto ao lado do troféu (assets/av-*.webp) */
+
 const ACH = {
-  logo:     { tier: 'bronze', img: 'av-face',
+  logo:     { tier: 'bronze', img: 'tr-logo',
               pt: { t: 'Corta!', d: 'Cinco cliques no logo e um segredo encontrado. Alguém aqui gosta de girar coisas.' },
               en: { t: 'Cut!', d: 'Five clicks on the logo and a secret found. Someone here likes spinning things.' } },
-  faces:    { tier: 'bronze', img: 'av-face',
+  faces:    { tier: 'bronze', img: 'tr-faces',
               pt: { t: 'Estourou a bolha', d: 'Você cutucou uma das carinhas da faixa vermelha.' },
               en: { t: 'Pop!', d: 'You poked one of the little faces on the red strip.' } },
-  portrait: { tier: 'bronze', img: 'av-portrait',
+  portrait: { tier: 'bronze', img: 'tr-portrait',
               pt: { t: 'Madrugada de render', d: 'Foto tirada às 3 da manhã, entre um render e outro.' },
               en: { t: 'Render o\'clock', d: 'Photo taken at 3 AM, between one render and another.' } },
-  footL:    { tier: 'bronze', img: 'av-real',
+  footL:    { tier: 'bronze', img: 'tr-footL',
               pt: { t: 'Boas-vindas', d: 'O Kin do rodapé agradeceu a sua visita.' },
               en: { t: 'Welcome', d: 'The Kin in the footer thanked you for stopping by.' } },
-  footR:    { tier: 'bronze', img: 'av-body',
+  footR:    { tier: 'bronze', img: 'tr-footR',
               pt: { t: 'Aceita café?', d: 'O outro Kin do rodapé aceita café como forma de pagamento.' },
               en: { t: 'Coffee?', d: 'The other Kin in the footer accepts coffee as payment.' } },
-  poke:     { tier: 'silver', img: 'av-body',
+  poke:     { tier: 'silver', img: 'tr-poke',
               pt: { t: 'Mascote estressado', d: 'Você cutucou o Kin até ele ficar bravo. Ele vai cobrar hora extra.' },
               en: { t: 'Stressed mascot', d: 'You poked Kin until he got angry. He is charging overtime.' } },
-  lost:     { tier: 'silver', img: 'av-pixel',
+  lost:     { tier: 'silver', img: 'tr-lost',
               pt: { t: 'Perdido na rede', d: 'Você caiu na página 404. O Kin finge que não viu.' },
               en: { t: 'Lost online', d: 'You landed on the 404 page. Kin pretends he didn\'t see.' } },
-  arcade:   { tier: 'silver', img: 'av-pixel',
+  arcade:   { tier: 'silver', img: 'tr-arcade',
               pt: { t: 'Fugitivo do 404', d: 'Você chegou a 150 pontos no minigame secreto da página 404.' },
               en: { t: '404 fugitive', d: 'You reached 150 points in the secret minigame on the 404 page.' } },
-  konami:   { tier: 'gold', img: 'av-real',
+  konami:   { tier: 'gold', img: 'tr-konami',
               pt: { t: 'Modo Kin', d: 'Você digitou o código secreto. Chuva de cabeças liberada!' },
               en: { t: 'Kin mode', d: 'You typed the secret code. Head rain unlocked!' } }
 };
 const PLATINUM = {
-  img: 'av-portrait',
+  img: 'tr-platinum',
   pt: { t: 'Platina!', d: 'Você encontrou todos os segredos do site. Obrigado por explorar cada cantinho!' },
   en: { t: 'Platinum!', d: 'You found every secret on the site. Thanks for exploring every corner!' }
 };
 const TROPHY_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 3h12v2h3v3c0 2.2-1.8 4-4 4h-.3A5 5 0 0 1 13 14.9V17h3v2H8v-2h3v-2.1A5 5 0 0 1 7.3 12H7C4.8 12 3 10.2 3 8V5h3V3zm0 4H5v1c0 1.1.9 2 2 2V7zm12 0v3c1.1 0 2-.9 2-2V7h-2z"/></svg>';
 
-const trophyMem = new Set();   // reserva caso o navegador bloqueie o localStorage
+const trophyMem = new Set();
 function trophyList() {
   let saved = [];
-  try { const a = JSON.parse(store(TROPHY_KEY) || '[]'); if (Array.isArray(a)) saved = a; } catch (e) { /* ignora */ }
+  try { const a = JSON.parse(store(TROPHY_KEY) || '[]'); if (Array.isArray(a)) saved = a; } catch (e) {  }
   return Array.from(new Set(saved.concat(Array.from(trophyMem))));
 }
 function kinUnlock(id) {
@@ -987,33 +1021,43 @@ function nextTrophy() {
   }
   const card = document.createElement('div');
   card.className = 'trophy ' + tier;
-  card.innerHTML = '<img class="tr-img" alt="" width="58" height="58" src="assets/' + def.img + '.webp">'
+  card.innerHTML = '<span class="tr-pic"><img class="tr-img" alt="" width="58" height="58" src="assets/' + def.img + '.webp"><span class="tr-burst"></span></span>'
     + '<div class="tr-text"><div class="tr-kind">' + TROPHY_SVG + '<span></span></div><div class="tr-title"></div><div class="tr-desc"></div></div>';
   $('.tr-kind span', card).textContent = L[tier] + ' ' + L.done + (plat ? '' : ' · ' + job.n + '/' + job.total);
   $('.tr-title', card).textContent = txt.t;
   $('.tr-desc', card).textContent = txt.d;
+  if (!REDUCE && (tier === 'gold' || tier === 'platinum')) burst($('.tr-burst', card), tier);
   stack.appendChild(card);
   void card.offsetWidth;
   card.classList.add('show');
   setTimeout(() => {
     card.classList.remove('show'); card.classList.add('hide');
     setTimeout(() => { card.remove(); nextTrophy(); }, 600);
-  }, plat ? 6500 : 4800);
+  }, plat ? 6800 : 5000);
+}
+function burst(host, tier) {
+  const colors = tier === 'platinum' ? ['#8fd8ff', '#ffffff', '#c9f0ff'] : ['#f5c542', '#fff3c4', '#ffffff'];
+  const n = 18;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('i');
+    const ang = (i / n) * Math.PI * 2 + Math.random() * 0.4, dist = 46 + Math.random() * 44;
+    s.style.cssText = '--dx:' + Math.round(Math.cos(ang) * dist) + 'px;--dy:' + Math.round(Math.sin(ang) * dist) + 'px;background:' + colors[i % colors.length] + ';animation-delay:' + (0.5 + Math.random() * 0.15).toFixed(2) + 's';
+    host.appendChild(s);
+  }
 }
 
-/* =====================================================================
-   GALERIA DE CONQUISTAS — botão discreto no rodapé; os troféus que
-   ainda não foram achados ficam misteriosos (só uma pista enigmática)
-   ===================================================================== */
+/* ========== Galeria de conquistas ========== */
 const GAL = {
   pt: { open: 'Ver conquistas', title: 'Conquistas', close: 'Fechar',
         sub: 'Segredos escondidos pelo site. Os que você ainda não achou ficam misteriosos.',
         all: 'Você achou tudo. Obrigado por explorar cada cantinho!',
-        tier: { bronze: 'Bronze', silver: 'Prata', gold: 'Ouro', platinum: 'Platina' } },
+        tier: { bronze: 'Bronze', silver: 'Prata', gold: 'Ouro', platinum: 'Platina' },
+        rarity: { bronze: 'Comum', silver: 'Rara', gold: 'Épica', platinum: 'Lendária' } },
   en: { open: 'View achievements', title: 'Achievements', close: 'Close',
         sub: 'Secrets hidden around the site. The ones you haven\'t found yet stay mysterious.',
         all: 'You found everything. Thanks for exploring every corner!',
-        tier: { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum' } }
+        tier: { bronze: 'Bronze', silver: 'Silver', gold: 'Gold', platinum: 'Platinum' },
+        rarity: { bronze: 'Common', silver: 'Rare', gold: 'Epic', platinum: 'Legendary' } }
 };
 const HINTS = {
   logo:     { pt: 'Algo no topo da Home reage a quem insiste.', en: 'Something at the top of the Home page reacts to persistence.' },
@@ -1056,7 +1100,7 @@ function renderGallery(g) {
     if (on) { pic.alt = ''; pic.width = 56; pic.height = 56; pic.src = 'assets/' + def.img + '.webp'; } else pic.textContent = '?';
     const box = document.createElement('div');
     const kind = document.createElement('div'); kind.className = 'tg-kind';
-    kind.textContent = on ? TIER_LABEL[lang][tier] : T.tier[tier];
+    kind.textContent = on ? TIER_LABEL[lang][tier] + ' · ' + T.rarity[tier] : T.tier[tier];
     const name = document.createElement('div'); name.className = 'tg-name';
     const desc = document.createElement('div'); desc.className = 'tg-desc';
     if (on) { const txt = def[lang] || def.pt; name.textContent = txt.t; desc.textContent = txt.d; }
@@ -1079,12 +1123,16 @@ function openGallery() {
   let g = $('#trophy-gallery');
   if (!g) {
     g = document.createElement('div');
-    g.id = 'trophy-gallery'; g.className = 'tg'; g.setAttribute('role', 'dialog'); g.setAttribute('aria-modal', 'true');
-    g.innerHTML = '<div class="tg-panel"><button type="button" class="tg-close">×</button><h2 class="tg-title"></h2><p class="tg-sub"></p>'
+    g.id = 'trophy-gallery'; g.className = 'tg'; g.setAttribute('role', 'dialog'); g.setAttribute('aria-modal', 'true'); g.setAttribute('aria-labelledby', 'tg-title');
+    g.innerHTML = '<div class="tg-panel"><button type="button" class="tg-close">×</button><h2 class="tg-title" id="tg-title"></h2><p class="tg-sub"></p>'
       + '<div class="tg-bar"><div class="tg-fill"></div></div><p class="tg-count"></p><div class="tg-list"></div></div>';
     document.body.appendChild(g);
     g.addEventListener('click', e => { if (e.target === g || e.target.closest('.tg-close')) closeGallery(); });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeGallery(); });
+    document.addEventListener('keydown', e => {
+      if (!g.classList.contains('open')) return;
+      if (e.key === 'Escape') closeGallery();
+      else if (e.key === 'Tab') trapTab(e, g);
+    });
   }
   renderGallery(g);
   galleryFocus = document.activeElement;
@@ -1100,7 +1148,6 @@ function initTrophyButton() {
   host.appendChild(b);
   b.addEventListener('click', openGallery);
   updateTrophyBtn();
-  // troca de idioma: atualiza o botão e a galeria aberta
   new MutationObserver(() => {
     updateTrophyBtn();
     const g = $('#trophy-gallery');
@@ -1108,7 +1155,7 @@ function initTrophyButton() {
   }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
 }
 
-/* ================================ Init ============================= */
+/* ========== Início ========== */
 document.addEventListener('DOMContentLoaded', () => {
   $$('img').forEach(img => { if (img.complete && img.naturalWidth === 0) tryNextExt(img); });
   fillCards();
@@ -1126,5 +1173,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initSecrets();
   initTrophyButton();
   $$('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
-  setLang(store('lang') === 'en' ? 'en' : 'pt');
+  setLang(store('lang') ? (store('lang') === 'en' ? 'en' : 'pt') : (/^en/i.test(navigator.language || '') ? 'en' : 'pt'));
+  openFromHash();
 });
