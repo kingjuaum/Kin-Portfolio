@@ -967,6 +967,9 @@ const ACH = {
   arcade:   { tier: 'silver', img: 'tr-arcade',
               pt: { t: 'Fugitivo do 404', d: 'Você chegou a 150 pontos no minigame secreto da página 404.' },
               en: { t: '404 fugitive', d: 'You reached 150 points in the secret minigame on the 404 page.' } },
+  meteor:   { tier: 'gold', img: 'tr-meteor',
+              pt: { t: 'Chuva de meteoros', d: 'Você sobreviveu ao nível secreto do minigame da 404.' },
+              en: { t: 'Meteor shower', d: 'You survived the secret level of the 404 minigame.' } },
   konami:   { tier: 'gold', img: 'tr-konami',
               pt: { t: 'Modo Kin', d: 'Você digitou o código secreto. Chuva de cabeças liberada!' },
               en: { t: 'Kin mode', d: 'You typed the secret code. Head rain unlocked!' } }
@@ -1068,10 +1071,11 @@ const HINTS = {
   poke:     { pt: 'Alguém na Home tem pouca paciência.', en: 'Someone on the Home page has little patience.' },
   lost:     { pt: 'Nem todo caminho leva a uma página que existe.', en: 'Not every path leads to a page that exists.' },
   arcade:   { pt: 'Quando a página some, às vezes sobra uma corrida.', en: 'When the page vanishes, sometimes a race is all that is left.' },
+  meteor:   { pt: 'Depois de correr bastante, o céu da 404 muda.', en: 'After running for a good while, the 404 sky changes.' },
   konami:   { pt: 'Quem joga há muito tempo conhece esta sequência. No celular, vale deslizar o dedo.', en: 'Longtime gamers know this sequence. On a phone, try swiping.' },
   platinum: { pt: 'Encontre todos os segredos.', en: 'Find all the secrets.' }
 };
-const GAL_ORDER = ['logo', 'faces', 'portrait', 'footL', 'footR', 'poke', 'lost', 'arcade', 'konami'];
+const GAL_ORDER = ['logo', 'faces', 'portrait', 'footL', 'footR', 'poke', 'lost', 'arcade', 'meteor', 'konami'];
 
 function trophyCount() { const have = trophyList(); return GAL_ORDER.filter(k => have.includes(k)).length; }
 function updateTrophyBtn() {
