@@ -2,9 +2,9 @@
 const CONTENT = {
   'home-longos': [ { youtube: '2fXMITWJsYU', thumb: '', title: 'Video 2' }, { youtube: 'geeIieObAyY', thumb: '', title: 'Video 1' }, { youtube: 'yAhCQgp-two', thumb: '', title: 'Video 3' } ],
   'home-curtos': [ { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 1' }, { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 2' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 3' } ],
-  longos: ['_F1QO28zyuQ', 'PIPRP-wYqUs', '2fXMITWJsYU', 'yAhCQgp-two', 'uSbEdqzeVwA', 'PKKpR2hgVmM']
+  longos: ['_F1QO28zyuQ', 'PIPRP-wYqUs', '2fXMITWJsYU', 'yAhCQgp-two', 'uSbEdqzeVwA', '11g5XDk9O2E', 'GNtqgw0BiBM']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
-  curtos: ['bIKyqQmvj1Y', 'c1bmlTtrYv8', 'F9GNgwOAREg', 'RxvgWMx4kLw', '4lkBaCZFCPo', '55mLGlL2gaQ']
+  curtos: ['bIKyqQmvj1Y', 'c1bmlTtrYv8', 'F9GNgwOAREg', 'RxvgWMx4kLw', '4lkBaCZFCPo', '55mLGlL2gaQ', 'bfM2NoRcu8U']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
   outros: ['bhpDx25A4EE', 'Scsorm5a4c4', 'blzK2CbFfXI', 'ThSuYlbClqY']
     .map((youtube, i) => ({ youtube, image: '', thumb: '', title: 'Trabalho ' + (i + 1) }))
@@ -61,13 +61,21 @@ const INFO = {
           desc: 'A video edited for the channel Meu Tech Mundo in Adobe Premiere, with dynamic editing and plenty of B-roll to build the best possible narrative for the comparison.',
           role: 'Video editing' }
   },
-  'PKKpR2hgVmM': {
+  '11g5XDk9O2E': {
     pt: { title: 'Explorando creepypastas antigas pra ver se elas realmente eram assustadoras',
           desc: 'Trecho do vídeo produzido para o meu canal do YouTube, em que revisito creepypastas antigas (2010–2012) para descobrir se davam mesmo medo ou se era só o nosso cérebro de criança que se assustava fácil demais.',
           role: 'Do roteiro à edição final' },
     en: { title: 'Exploring old creepypastas to see if they were really scary',
           desc: 'An excerpt from the video made for my YouTube channel, where I revisit old creepypastas (2010–2012) to find out whether they were really scary or if our childhood brains just got spooked too easily.',
           role: 'From script to final edit' }
+  },
+  'GNtqgw0BiBM': {
+    pt: { title: 'Finding the HORNIEST People on Reddit…',
+          desc: 'Vídeo editado para o YouTuber americano Bran, reunindo em um só vídeo uma compilação de posts do Reddit aos quais ele reagiu durante uma live.',
+          role: 'Edição do vídeo' },
+    en: { title: 'Finding the HORNIEST People on Reddit…',
+          desc: 'A video edited for American YouTuber Bran, compiling Reddit posts he reacted to during a livestream into a single video.',
+          role: 'Video editing' }
   },
 
   /* ========== Vídeos curtos ========== */
@@ -117,6 +125,14 @@ const INFO = {
           role: 'Do roteiro à edição final' },
     en: { title: 'I got roasted by a streamer on a livestream…',
           desc: 'A short for Instagram and TikTok from a reaction I did on stream: content creator Eudinha reacting to and analyzing my Instagram profile. Funny and dynamic.',
+          role: 'From script to final edit' }
+  },
+  'bfM2NoRcu8U': {
+    pt: { title: 'Eu paro a hora que eu quiser, man...',
+          desc: 'Vídeo produzido a partir de uma das minhas lives na Twitch. Neste Shorts, joguei um mod de Minecraft que trazia um sistema de apostas para aprimorar itens. A ideia foi mostrar, de forma leve e usando o jogo como exemplo, como é fácil perder tudo o que temos ao apostar.',
+          role: 'Do roteiro à edição final' },
+    en: { title: 'I can stop whenever I want, man...',
+          desc: 'A video made from one of my Twitch livestreams. In this Short, I played a Minecraft mod with a betting system for upgrading items. The goal was to show, in a lighthearted way and using the game as an example, how easy it is to lose everything we have by gambling.',
           role: 'From script to final edit' }
   },
 
