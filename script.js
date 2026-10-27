@@ -184,7 +184,9 @@ const EN = {
   contacts: 'My Contacts',
   hero_t1: 'Video Editor &', hero_t2: 'Motion Designer',
   hero_sub: 'Dynamic edits, with technique and the fast language the internet demands.',
-  see_all: 'See all', soon: 'Coming soon', close: 'Close'
+  see_all: 'See all', soon: 'Coming soon', close: 'Close',
+  footer_note: 'Exported in H.264 · no "Error compiling movie" (this time)',
+  nf_memo: 'Error 404', nf_off: 'Media offline · 404.mp4', nf_hole: 'There was a page here. It\'s gone now.'
 };
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -724,7 +726,7 @@ const POKE = {
   en: ['Ouch! Don\'t pinch me, dude 😣', 'Seriously, that hurts!', 'Hey, stop that, okay?', 'I said stop…',
        'I\'m getting angry here!', 'Dude, SERIOUSLY. I\'m a mascot, not a button!', 'LAST WARNING!! 😠',
        'ENOUGH! I\'m charging overtime per click! 💸', 'We\'re not talking anymore. 😤'],
-  sulk: { pt: ['Não falo mais com você.', 'Tô de mal. Fim de papo.', '…', 'Hmpf.'], en: ['Not talking to you.', 'I\'m done. Period.', '…', 'Hmpf.'] },
+  sulk: { pt: ['Não falo mais com você.', 'Tô de mal. Fim de papo.', '…', 'Hmpf.', 'Tá ouvindo esse chiado de rádio? Tem algo perto…'], en: ['Not talking to you.', 'I\'m done. Period.', '…', 'Hmpf.', 'Hear that radio static? Something\'s close…'] },
   calm: { pt: 'Tá… tá perdoado. 🙂', en: 'Okay… you\'re forgiven. 🙂' }
 };
 
@@ -777,27 +779,19 @@ function initFooterTalk() {
 function initSecrets() {
   const seq = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
   let pos = 0;
+  const pad = initKeypad(seq.length);
   const feed = k => {
+    const before = pos;
     pos = (k === seq[pos]) ? pos + 1 : (k === seq[0] ? 1 : 0);
-    if (pos === seq.length) { pos = 0; kinRain(); kinUnlock('konami'); }
+    const done = pos === seq.length;
+    pad.progress(pos, before > 0 && pos <= 1 && k !== seq[0]);
+    if (done) { pos = 0; pad.done(); kinRain(); kinUnlock('konami'); }
   };
-  document.addEventListener('keydown', e => feed(e.key.length === 1 ? e.key.toLowerCase() : e.key));
-
-  let tx = 0, ty = 0, tid = null;
-  document.addEventListener('touchstart', e => {
-    if (e.touches.length !== 1) { tid = null; return; }
-    const t = e.touches[0]; tx = t.clientX; ty = t.clientY; tid = t.identifier;
-  }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (tid === null) return;
-    const t = Array.from(e.changedTouches).find(c => c.identifier === tid);
-    tid = null;
-    if (!t) return;
-    const dx = t.clientX - tx, dy = t.clientY - ty, ax = Math.abs(dx), ay = Math.abs(dy);
-    if (Math.max(ax, ay) < 14) { feed(pos === 8 ? 'b' : pos === 9 ? 'a' : 'tap'); return; }
-    if (Math.max(ax, ay) < 48) return;
-    feed(ax > ay ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : (dy > 0 ? 'ArrowDown' : 'ArrowUp'));
-  }, { passive: true });
+  document.addEventListener('keydown', e => {
+    if (e.target && e.target.closest && e.target.closest('input, textarea, [contenteditable]')) return;
+    feed(e.key.length === 1 ? e.key.toLowerCase() : e.key);
+  });
+  pad.onKey(feed);
 
   const logo = $('.logo');
   if (logo) {
@@ -821,6 +815,96 @@ function initSecrets() {
   if (p) p.addEventListener('click', () => { if (!kinUnlock('portrait')) toast(curLang() === 'en' ? '📸 Taken at 3 AM, between one render and another.' : '📸 Foto tirada às 3 da manhã, entre um render e outro.'); });
 
   console.log('%cOpa, curioso! 👀 Tem segredos escondidos por aqui. Dica: ↑ ↑ ↓ ↓ ← → ← → B A', 'font:16px sans-serif;color:#cd0024');
+  console.log('%cError compiling movie. Unknown error. (só brincadeira, aqui o render passou)', 'font:12px monospace;color:#888');
+  console.log('%cThere was a hole here. It\'s gone now.', 'font:italic 12px serif;color:#888');
+}
+
+/* Controle de arcade (celular): digita o código secreto sem teclado */
+const PAD_TXT = {
+  pt: { fab: 'Abrir controle de arcade', title: 'Digite o código', close: 'Fechar controle', up: 'Cima', down: 'Baixo', left: 'Esquerda', right: 'Direita' },
+  en: { fab: 'Open arcade controller', title: 'Enter the code', close: 'Close controller', up: 'Up', down: 'Down', left: 'Left', right: 'Right' }
+};
+function initKeypad(len) {
+  const api = { _cb: null, onKey(fn) { this._cb = fn; }, progress() {}, done() {} };
+  if (!matchMedia('(hover: none) and (pointer: coarse)').matches) return api;
+  const L = () => PAD_TXT[curLang()];
+  const fab = document.createElement('button');
+  fab.type = 'button'; fab.className = 'kpad-fab';
+  fab.textContent = '🎮';
+  const box = document.createElement('div');
+  box.className = 'kpad'; box.hidden = true;
+  box.setAttribute('role', 'dialog');
+  const btn = (cls, key, label, inner) => '<button type="button" class="kb ' + cls + '" data-k="' + key + '" aria-label="' + label + '">' + inner + '</button>';
+  box.innerHTML =
+    '<div class="kpad-body">' +
+      '<div class="kpad-top"><span class="kpad-title"></span><span class="kpad-dots" aria-hidden="true">' + '<i></i>'.repeat(len) + '</span><button type="button" class="kpad-x">×</button></div>' +
+      '<div class="kpad-deck"><div class="dpad">' +
+        btn('up', 'ArrowUp', '', '<b></b>') + btn('left', 'ArrowLeft', '', '<b></b>') + '<span class="dp-mid"></span>' + btn('right', 'ArrowRight', '', '<b></b>') + btn('down', 'ArrowDown', '', '<b></b>') +
+      '</div><div class="abtns">' + btn('bb', 'b', 'B', 'B') + btn('ba', 'a', 'A', 'A') + '</div></div>' +
+    '</div>';
+  document.body.append(fab, box);
+  const dots = $$('.kpad-dots i', box);
+  const labels = () => {
+    const t = L();
+    fab.setAttribute('aria-label', t.fab);
+    box.setAttribute('aria-label', t.title);
+    $('.kpad-title', box).textContent = t.title;
+    $('.kpad-x', box).setAttribute('aria-label', t.close);
+    $$('.kb', box).forEach(b => { const m = { ArrowUp: t.up, ArrowDown: t.down, ArrowLeft: t.left, ArrowRight: t.right }[b.dataset.k]; if (m) b.setAttribute('aria-label', m); });
+  };
+  labels();
+  new MutationObserver(labels).observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+  const open = () => { box.hidden = false; fab.hidden = true; void box.offsetWidth; box.classList.add('open'); };
+  const close = () => { box.classList.remove('open'); box.hidden = true; fab.hidden = false; };
+  fab.addEventListener('click', open);
+  $('.kpad-x', box).addEventListener('click', close);
+  box.addEventListener('click', e => { if (e.target === box) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !box.hidden) close(); });
+  box.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.kb');
+    if (!b) return;
+    e.preventDefault();
+    b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit');
+    if (navigator.vibrate) { try { navigator.vibrate(12); } catch (err) { } }
+    if (api._cb) api._cb(b.dataset.k);
+  });
+  api.progress = (n, wrong) => {
+    dots.forEach((d, i) => d.classList.toggle('on', i < n));
+    if (wrong) { box.classList.remove('nope'); void box.offsetWidth; box.classList.add('nope'); }
+  };
+  api.done = () => { setTimeout(() => { close(); dots.forEach(d => d.classList.remove('on')); }, 650); };
+  return api;
+}
+
+/* Easter eggs de edição de vídeo e de Silent Hill 2 */
+function initNods() {
+  const title = document.title;
+  let restore = 0;
+  document.addEventListener('visibilitychange', () => {
+    clearTimeout(restore);
+    if (document.hidden) { document.title = curLang() === 'en' ? '⚠ Media offline' : '⚠ Mídia offline'; return; }
+    document.title = curLang() === 'en' ? 'Relinking media…' : 'Revinculando mídia…';
+    restore = setTimeout(() => { document.title = title; }, 1400);
+  });
+
+  let hinted = false;
+  const tracks = $$('.marquee-track');
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      if ((e.key === 'z' || e.key === 'Z') && !e.shiftKey && !(e.target && e.target.closest && e.target.closest('input, textarea, [contenteditable]'))) {
+        toast(curLang() === 'en' ? 'Ctrl+Z: nothing to undo. At least the project didn\'t crash. 💀' : 'Ctrl+Z: nada pra desfazer. Pelo menos o projeto não crashou. 💀');
+      }
+      return;
+    }
+    if (!tracks.length || (e.target && e.target.closest && e.target.closest('input, textarea, select, [contenteditable]'))) return;
+    const k = e.key.toLowerCase();
+    if (k !== 'j' && k !== 'k' && k !== 'l') return;
+    tracks.forEach(t => {
+      if (k === 'k') t.style.animationPlayState = 'paused';
+      else { t.style.animationPlayState = 'running'; t.style.animationDirection = k === 'j' ? 'reverse' : 'normal'; }
+    });
+    if (!hinted) { hinted = true; toast(curLang() === 'en' ? 'J · K · L — like in Premiere ⏯' : 'J · K · L — igual no Premiere ⏯'); }
+  });
 }
 
 function kinRain() {
@@ -1088,7 +1172,7 @@ const HINTS = {
   lost:     { pt: 'Nem todo caminho leva a uma página que existe.', en: 'Not every path leads to a page that exists.' },
   arcade:   { pt: 'Quando a página some, às vezes sobra uma corrida.', en: 'When the page vanishes, sometimes a race is all that is left.' },
   meteor:   { pt: 'Depois de correr bastante, o céu da 404 muda.', en: 'After running for a good while, the 404 sky changes.' },
-  konami:   { pt: 'Quem joga há muito tempo conhece esta sequência. No celular, vale deslizar o dedo.', en: 'Longtime gamers know this sequence. On a phone, try swiping.' },
+  konami:   { pt: 'Quem joga há muito tempo conhece esta sequência. No celular, abra o controle de arcade (botão 🎮 no canto da tela).', en: 'Longtime gamers know this sequence. On a phone, open the arcade controller (🎮 button in the corner).' },
   platinum: { pt: 'Encontre todos os segredos.', en: 'Find all the secrets.' }
 };
 const GAL_ORDER = ['logo', 'faces', 'portrait', 'footL', 'footR', 'poke', 'lost', 'arcade', 'meteor', 'konami'];
@@ -1165,6 +1249,10 @@ function initTrophyButton() {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'trophy-open';
   b.innerHTML = TROPHY_SVG + '<span></span>';
+  const note = document.createElement('p');
+  note.className = 'footer-note'; note.setAttribute('data-i18n', 'footer_note');
+  note.textContent = 'Exportado em H.264 · sem “Error compiling movie” (dessa vez)';
+  host.appendChild(note);
   host.appendChild(b);
   b.addEventListener('click', openGallery);
   updateTrophyBtn();
@@ -1191,6 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPoke();
   initFooterTalk();
   initSecrets();
+  initNods();
   initTrophyButton();
   $$('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
   setLang(store('lang') ? (store('lang') === 'en' ? 'en' : 'pt') : (/^en/i.test(navigator.language || '') ? 'en' : 'pt'));

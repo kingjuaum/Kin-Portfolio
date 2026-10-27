@@ -12,10 +12,10 @@
   var lang = function () { return document.documentElement.dataset.lang === 'en' ? 'en' : 'pt'; };
   var T = function () { return TXT[lang()]; };
 
-  var W = 600, H = 170, GROUND = 142, FW = 37, FH = 48, KX = 52;
+  var W = 600, H = 170, GROUND = 142, FW = 37, FH = 48, KX = 52, BY = 34, portrait = false, SPD = 1;
   var GOAL = 150, SHOWER_FIRST = 200, SHOWER_PERIOD = 320, SHOWER_LEN = 120;
   var BEST_KEY = 'kinRunBest';
-  var DAY = { bg: [247, 247, 247], ink: [83, 83, 83], soft: [117, 117, 117], cloud: [218, 218, 218], dots: [172, 172, 172] };
+  var DAY = { bg: [207, 199, 182], ink: [44, 40, 36], soft: [96, 90, 80], cloud: [190, 182, 166], dots: [140, 133, 120] };
   var NIGHT = { bg: [32, 33, 36], ink: [214, 214, 214], soft: [150, 150, 156], cloud: [58, 59, 64], dots: [96, 96, 102] };
   var DUSK = [52, 24, 24];
 
@@ -28,7 +28,8 @@
     'E': ['111', '100', '111', '100', '111'], 'O': ['111', '101', '101', '101', '111'], 'V': ['101', '101', '101', '101', '010'],
     'R': ['111', '101', '111', '110', '101'], 'N': ['101', '111', '111', '111', '101'], 'L': ['100', '100', '100', '100', '111'],
     'S': ['111', '100', '111', '001', '111'], 'C': ['111', '100', '100', '100', '111'], 'T': ['111', '010', '010', '010', '010'],
-    'B': ['110', '101', '110', '101', '110'], 'U': ['101', '101', '101', '101', '111'], '!': ['1', '1', '1', '0', '1'], ' ': ['00', '00', '00', '00', '00']
+    'B': ['110', '101', '110', '101', '110'], 'D': ['110', '101', '101', '101', '110'], 'F': ['111', '100', '110', '100', '100'],
+    'P': ['111', '101', '111', '100', '100'], 'Y': ['101', '101', '010', '010', '010'], 'W': ['10001', '10001', '10101', '11011', '10001'], 'U': ['101', '101', '101', '101', '111'], '!': ['1', '1', '1', '0', '1'], ' ': ['00', '00', '00', '00', '00']
   };
 
   var game = document.createElement('section');
@@ -63,12 +64,30 @@
   if (sheet.complete && sheet.naturalWidth) makeNight(); else sheet.addEventListener('load', makeNight);
 
   var stars = [];
-  for (var si = 0; si < 18; si++) stars.push({ x: (si * 97 + 31) % (W - 20) + 10, y: (si * 53 + 17) % 78 + 8 });
+  function buildStars() {
+    stars = [];
+    var sky = Math.max(60, GROUND - 64), n = portrait ? 30 : 18;
+    for (var si = 0; si < n; si++) stars.push({ x: (si * 97 + 31) % (W - 20) + 10, y: (si * 53 + 17) % sky + 8 });
+  }
+  function wantPortrait() { return window.innerWidth <= 820 && window.innerHeight > window.innerWidth * 1.05; }
+  function layout() {
+    portrait = wantPortrait();
+    game.classList.toggle('portrait', portrait);
+    document.documentElement.classList.toggle('ag-lock', portrait && state !== 'idle');
+    if (portrait) {
+      W = 420;
+      H = clamp(Math.round(W * (screen.offsetHeight || window.innerHeight) / (screen.offsetWidth || window.innerWidth)), 480, 1000);
+      GROUND = Math.round(H * 0.66); BY = 78; SPD = 0.85;
+    } else { W = 600; H = 170; GROUND = 142; BY = 34; SPD = 1; }
+    cv.width = W; cv.height = H;
+    buildStars();
+  }
 
   var state = 'idle';
   var raf = 0, last = 0;
   var speed, dist, scoreF, y, vy, obstacles, meteors, sparks, craters, clouds, nextGap, frame, best, goalDone;
-  var tn, tr, showerOn, meteorTimer, banner, shake;
+  var tn, tr, showerOn, meteorTimer, banner, shake, threatCD, shotCount, ufo, overSub;
+  var SUBS = ['ERROR COMPILING MOVIE', 'MEDIA OFFLINE', 'DROPPED FRAMES', 'RENDER FAILED', 'THERE WAS A HOLE HERE', 'IN MY RESTLESS DREAMS'];
 
   function readBest() { try { return parseInt(localStorage.getItem(BEST_KEY), 10) || 0; } catch (e) { return 0; } }
   function saveBest(v) { try { localStorage.setItem(BEST_KEY, String(v)); } catch (e) { return; } }
@@ -82,7 +101,8 @@
     speed = 5.5; dist = 0; scoreF = 0; y = 0; vy = 0; frame = 0; goalDone = false;
     obstacles = []; meteors = []; sparks = []; craters = [];
     nextGap = 170; tn = 0; tr = 0; showerOn = false; meteorTimer = 0; banner = null; shake = 0;
-    clouds = [{ x: 90, y: 26 }, { x: 290, y: 48 }, { x: 480, y: 20 }];
+    threatCD = 0; shotCount = 0; ufo = null; overSub = '';
+    clouds = [90, 290, 480].map(function (cx, ci) { return { x: cx, y: portrait ? 90 + ci * 80 + Math.random() * 30 : [26, 48, 20][ci] }; });
     best = readBest();
   }
 
@@ -129,11 +149,13 @@
 
   function spawnObstacle() {
     var sc = scoreF;
-    var flyP = sc < 100 ? 0 : (sc < 200 ? 0.22 : 0.32);
+    var flyP = showerOn ? 0 : (sc < 100 ? 0 : (sc < 200 ? 0.22 : 0.32));
     if (Math.random() < flyP) { var f = makeFly(); obstacles.push(f); return f.w; }
     var count = 1;
-    if (sc > 60 && Math.random() < Math.min(0.5, (sc - 40) / 260)) count = 2;
-    if (sc > 160 && Math.random() < 0.2) count = 3;
+    if (!showerOn) {
+      if (sc > 60 && Math.random() < Math.min(0.5, (sc - 40) / 260)) count = 2;
+      if (sc > 160 && Math.random() < 0.2) count = 3;
+    }
     var x = W + 10, total = 0;
     for (var i = 0; i < count; i++) {
       var o = makeObstacle();
@@ -143,12 +165,15 @@
     return total;
   }
 
-  function spawnMeteor(prog) {
-    var vyy = lerp(5, 9, prog) * (0.9 + Math.random() * 0.2), vx = -(2 + Math.random() * 2);
-    var near = Math.random() < 0.7;
-    var ix = near ? KX + FW / 2 + (Math.random() * 170 - 50) : 120 + Math.random() * 420;
-    var tt = (GROUND + 24) / vyy;
-    meteors.push({ x: ix - vx * tt, y: -24, vx: vx, vy: vyy, ix: ix });
+  // threat = cai na coluna do Kin (dá pra desviar pulando); o resto cai longe e só enfeita
+  function spawnMeteor(prog, threat) {
+    var fall = lerp(86, 64, prog) * (0.92 + Math.random() * 0.16);
+    // meteoro-ameaça sempre cai a mesma altura (166px), mesmo na tela vertical: o ângulo e o tempo de reação não mudam
+    var drop = threat ? Math.min(166, GROUND + 24) : GROUND + 24;
+    var vyy = drop / fall, vx = -(1.2 + Math.random() * 1.6);
+    var kc = KX + FW / 2;
+    var ix = threat ? kc + (Math.random() * 14 - 7) : kc + 80 + Math.random() * Math.max(40, W - kc - 120);
+    meteors.push({ x: ix - vx * fall, y: GROUND - drop, vx: vx, vy: vyy, ix: ix, wait: threat ? 40 : 16, threat: !!threat, age: 0, fade: threat && GROUND - drop > 0 });
   }
 
   function explode(m) {
@@ -193,6 +218,15 @@
     ctx.globalAlpha = 1;
   }
 
+  function drawUfo(P) {
+    var x = Math.round(ufo.x), yy = Math.round(ufo.y + Math.sin(ufo.x / 16) * 3);
+    ctx.fillStyle = P.ink;
+    ctx.fillRect(x + 6, yy, 6, 2); ctx.fillRect(x + 4, yy + 2, 10, 2);
+    ctx.fillRect(x, yy + 4, 18, 3); ctx.fillRect(x + 3, yy + 7, 12, 2);
+    ctx.fillStyle = P.bg;
+    for (var li = 0; li < 3; li++) if ((Math.floor(frame / 7) + li) % 3 !== 0) ctx.fillRect(x + 3 + li * 5, yy + 5, 2, 1);
+  }
+
   function drawGround(P) {
     ctx.fillStyle = P.ink;
     ctx.fillRect(0, GROUND + 2, W, 2);
@@ -205,20 +239,34 @@
     }
     ctx.fillStyle = P.ink;
     for (var c = 0; c < craters.length; c++) ctx.fillRect(Math.round(craters[c].x) - 9, GROUND + 5, 18, 2);
+    if (portrait) {
+      ctx.fillStyle = P.dots;
+      for (var ry = GROUND + 34, row = 0; ry < H; ry += 30, row++) {
+        var roff = (dist * (0.7 + row * 0.12)) % 96;
+        for (var rx = -roff + row * 31; rx < W; rx += 96) ctx.fillRect(Math.round(rx), ry, 10 + (row % 3) * 4, 2);
+      }
+    }
   }
 
   function drawMeteor(m) {
-    var blink = Math.floor(frame / 4) % 2 === 0;
-    if (blink) { ctx.fillStyle = '#ff4d2f'; ctx.fillRect(Math.round(m.ix) - 10, GROUND + 6, 20, 2); }
+    var blink = Math.floor(frame / (m.threat ? 3 : 5)) % 2 === 0;
+    if (blink) {
+      ctx.fillStyle = m.threat ? '#ff2a1a' : '#ff9d3d';
+      var mw = m.threat ? 34 : 14, mh = m.threat ? 4 : 2;
+      ctx.fillRect(Math.round(m.ix) - mw / 2, GROUND + 6, mw, mh);
+    }
+    if (m.wait > 0) return;
+    var fa = m.fade ? clamp(m.age / 14, 0, 1) : 1;
     for (var i = 6; i >= 1; i--) {
-      ctx.globalAlpha = (1 - i / 7) * 0.85;
+      ctx.globalAlpha = (1 - i / 7) * 0.85 * fa;
       ctx.fillStyle = i > 3 ? '#ff4d2f' : '#ff9d3d';
       var s = 9 - i;
       ctx.fillRect(Math.round(m.x - m.vx * i * 1.7 - s / 2), Math.round(m.y - m.vy * i * 1.7 - s / 2), s, s);
     }
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = fa;
     disc(m.x, m.y, 8, '#ff7a2f');
     disc(m.x - 1, m.y - 1, 4, '#ffe08a');
+    ctx.globalAlpha = 1;
   }
 
   function drawKin() {
@@ -243,6 +291,7 @@
     ctx.fillStyle = P.bg;
     ctx.fillRect(-6, -6, W + 12, H + 12);
     drawSky(P);
+    if (ufo) drawUfo(P);
     for (var c = 0; c < clouds.length; c++) drawCloud(clouds[c], P.cloud);
     drawGround(P);
     for (var i = 0; i < obstacles.length; i++) drawObstacle(obstacles[i], P.ink);
@@ -260,12 +309,13 @@
     drawText(hiStr, W - 16 - textWidth(hiStr + ' ' + cur, 3), 8, 3, P.soft);
     drawText(cur, W - 16 - textWidth(cur, 3), 8, 3, P.ink);
     if (banner && banner.t > 0 && Math.floor(banner.t / 12) % 2 === 0) {
-      if (banner.a) drawText(banner.a, Math.round((W - textWidth(banner.a, 2)) / 2), 34, 2, P.soft);
-      drawText(banner.b, Math.round((W - textWidth(banner.b, 5)) / 2), 52, 5, showerOn ? '#ff7a2f' : P.ink);
+      if (banner.a) drawText(banner.a, Math.round((W - textWidth(banner.a, 2)) / 2), BY, 2, P.soft);
+      drawText(banner.b, Math.round((W - textWidth(banner.b, 5)) / 2), BY + 18, 5, showerOn ? '#ff7a2f' : P.ink);
     }
     if (state === 'over') {
       var t = 'GAME OVER';
-      drawText(t, Math.round((W - textWidth(t, 6)) / 2), 30, 6, P.ink);
+      drawText(t, Math.round((W - textWidth(t, 6)) / 2), BY - 4, 6, P.ink);
+      if (overSub) drawText(overSub, Math.round((W - textWidth(overSub, 2)) / 2), BY + 36, 2, P.soft);
     }
   }
 
@@ -279,8 +329,9 @@
     }
     for (var j = 0; j < meteors.length; j++) {
       var m = meteors[j];
+      if (m.wait > 0) continue;
       var nx = clamp(m.x, kx, kx + kw), ny = clamp(m.y, ky, ky + kh);
-      if ((m.x - nx) * (m.x - nx) + (m.y - ny) * (m.y - ny) < 49) return true;
+      if ((m.x - nx) * (m.x - nx) + (m.y - ny) * (m.y - ny) < 36) return true;
     }
     return false;
   }
@@ -296,13 +347,15 @@
     var k = dt / 16.667;
     frame += k;
     speed = 5.5 + 8.5 * (1 - Math.exp(-scoreF / 180));
+    if (showerOn) speed = Math.min(speed, 10.5);
+    speed *= SPD;
     dist += speed * k;
     scoreF += speed * 0.02 * k;
 
     var n = scoreF >= SHOWER_FIRST ? Math.floor((scoreF - SHOWER_FIRST) / SHOWER_PERIOD) : -1;
     var pos = n >= 0 ? scoreF - (SHOWER_FIRST + SHOWER_PERIOD * n) : 0;
     var on = n >= 0 && pos < SHOWER_LEN;
-    if (on && !showerOn) { showerOn = true; banner = { a: 'NIVEL SECRETO', b: 'METEOROS', t: 150 }; meteorTimer = 45; announce(T().secret); }
+    if (on && !showerOn) { showerOn = true; banner = { a: 'NIVEL SECRETO', b: 'METEOROS', t: 150 }; meteorTimer = 60; threatCD = 40; shotCount = 0; announce(T().secret); }
     if (!on && showerOn) {
       showerOn = false; banner = { a: '', b: 'SOBREVIVEU!', t: 120 }; announce(T().survived);
       if (window.kinUnlock) window.kinUnlock('meteor');
@@ -328,23 +381,37 @@
 
     nextGap -= speed * k;
     if (nextGap <= 0) {
-      var wide = spawnObstacle();
-      var lvl = clamp(scoreF / 300, 0, 1);
-      var frames = lerp(46 + Math.random() * 30, 37 + Math.random() * 15, lvl);
-      nextGap = frames * speed * (showerOn ? 1.3 : 1) + wide;
+      var busy = false;
+      for (var bi = 0; bi < meteors.length; bi++) if (meteors[bi].threat) busy = true;
+      if (busy) nextGap = 14 * speed;
+      else {
+        var wide = spawnObstacle();
+        var lvl = clamp(scoreF / 300, 0, 1);
+        var frames = lerp(46 + Math.random() * 30, 37 + Math.random() * 15, lvl);
+        nextGap = frames * speed * (showerOn ? 1.7 : 1) + wide;
+      }
     }
 
+    if (!ufo && tn > 0.85 && Math.random() < 0.0008 * k) ufo = { x: -24, y: 20 + Math.random() * (portrait ? 150 : 22) };
+    if (ufo) { ufo.x += 0.9 * k; if (ufo.x > W + 24) ufo = null; }
+
     if (showerOn) {
-      meteorTimer -= k;
+      meteorTimer -= k; threatCD -= k;
       if (meteorTimer <= 0) {
-        spawnMeteor(prog);
-        if (prog > 0.5 && Math.random() < 0.4) spawnMeteor(prog);
-        meteorTimer = lerp(72, 26, prog) * (0.8 + Math.random() * 0.4);
+        var clear = true;
+        for (var oi = 0; oi < obstacles.length; oi++) if (obstacles[oi].x + obstacles[oi].w > KX - 14) clear = false;
+        var threat = shotCount > 0 && clear && threatCD <= 0 && Math.random() < 0.6;
+        spawnMeteor(prog, threat);
+        if (threat) threatCD = 115;
+        else if (prog > 0.5 && Math.random() < 0.35) spawnMeteor(prog, false);
+        shotCount++;
+        meteorTimer = lerp(66, 40, prog) * (0.85 + Math.random() * 0.3);
       }
     }
     for (var m = meteors.length - 1; m >= 0; m--) {
       var mt = meteors[m];
-      mt.x += mt.vx * k; mt.y += mt.vy * k;
+      if (mt.wait > 0) { mt.wait -= k; continue; }
+      mt.x += mt.vx * k; mt.y += mt.vy * k; mt.age += k;
       if (mt.y >= GROUND) { explode(mt); meteors.splice(m, 1); }
     }
     for (var s = sparks.length - 1; s >= 0; s--) {
@@ -362,6 +429,7 @@
     state = 'over';
     var sc = Math.floor(scoreF);
     if (sc > best) { best = sc; saveBest(best); }
+    overSub = SUBS[Math.floor(Math.random() * SUBS.length)];
     setMsg(T().again);
     announce(T().over + ' ' + sc + ' ' + T().pts);
   }
@@ -375,12 +443,13 @@
 
   function openGame() {
     if (state !== 'idle') return;
+    state = 'ready';
+    main.hidden = true; game.hidden = false;
+    layout();
     reset();
     exitBtn.textContent = T().exit;
     screen.setAttribute('aria-label', T().label);
-    main.hidden = true; game.hidden = false;
     screen.classList.remove('on'); void screen.offsetWidth; screen.classList.add('on');
-    state = 'ready';
     setMsg(T().ready);
     last = 0;
     cancelAnimationFrame(raf);
@@ -392,6 +461,7 @@
     if (state === 'idle') return;
     state = 'idle';
     cancelAnimationFrame(raf);
+    document.documentElement.classList.remove('ag-lock');
     game.hidden = true; main.hidden = false;
     var b = document.querySelector('.nf-btn');
     if (b) b.focus();
@@ -414,4 +484,15 @@
     if (e.code === 'Space' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') { e.preventDefault(); jump(); }
   });
   exitBtn.addEventListener('click', closeGame);
+  function onResize() {
+    if (state === 'idle' || wantPortrait() === portrait) return;
+    layout(); reset(); state = 'ready'; setMsg(T().ready); last = 0;
+  }
+  if (window.ResizeObserver) new ResizeObserver(function () {
+    if (!portrait || state === 'idle' || state === 'run') return;
+    var h = clamp(Math.round(W * screen.offsetHeight / (screen.offsetWidth || 1)), 480, 1000);
+    if (Math.abs(h - H) > 2) { layout(); reset(); }
+  }).observe(screen);
+  window.addEventListener('resize', onResize);
+  window.addEventListener('orientationchange', onResize);
 })();
