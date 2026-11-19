@@ -241,13 +241,17 @@ function fillCards() {
     const src = item.thumb || (item.youtube ? ytThumb(item.youtube, 'maxresdefault') : '');
     if (src) {
       const img = document.createElement('img');
-      img.className = 'thumb'; img.src = src; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+      img.className = 'thumb'; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+      const loaded = () => { img.classList.add('loaded'); card.classList.add('is-loaded'); };
+      img.addEventListener('load', loaded);
       img.addEventListener('error', () => {
         if (!item.thumb && item.youtube && !img.dataset.fallback) { img.dataset.fallback = '1'; img.src = ytThumb(item.youtube, 'hqdefault'); }
-        else { img.remove(); card.classList.add('no-thumb'); }
+        else { img.remove(); card.classList.add('no-thumb', 'is-loaded'); }
       });
+      img.src = src;
       card.prepend(img);
-    } else card.classList.add('no-thumb');
+      if (img.complete && img.naturalWidth) loaded();
+    } else card.classList.add('no-thumb', 'is-loaded');
     const cap = document.createElement('span');
     cap.className = 'cap'; cap.setAttribute('aria-hidden', 'true'); cap.textContent = cardTitle(item);
     card.append(cap);
@@ -476,6 +480,7 @@ function initHeader() {
   const setOpen = open => { header.classList.toggle('open', open); toggle.setAttribute('aria-expanded', String(open)); };
   toggle.addEventListener('click', () => setOpen(!header.classList.contains('open')));
   $$('.nav-panel a').forEach(a => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('click', e => { if (header.classList.contains('open') && !header.contains(e.target)) setOpen(false); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') setOpen(false); });
 }
 
@@ -695,6 +700,19 @@ function initTilt() {
       card.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
     });
     card.addEventListener('pointerleave', () => { card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg'); });
+  });
+}
+
+/* ========== Botões magnéticos ========== */
+function initMagnetic() {
+  if (REDUCE || !FINE_POINTER) return;
+  $$('.home-hero .btn, .see-all').forEach(el => {
+    el.addEventListener('pointermove', e => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', (((e.clientX - r.left) / r.width - 0.5) * 10).toFixed(1) + 'px');
+      el.style.setProperty('--my', (((e.clientY - r.top) / r.height - 0.5) * 8).toFixed(1) + 'px');
+    });
+    el.addEventListener('pointerleave', () => { el.style.setProperty('--mx', '0px'); el.style.setProperty('--my', '0px'); });
   });
 }
 
@@ -1276,6 +1294,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initWaves();
   initHeadsBg();
   initTilt();
+  initMagnetic();
   initPoke();
   initFooterTalk();
   initSecrets();
