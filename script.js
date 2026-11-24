@@ -2,7 +2,7 @@
 const CONTENT = {
   'home-longos': [ { youtube: '2fXMITWJsYU', thumb: '', title: 'Video 2' }, { youtube: 'geeIieObAyY', thumb: '', title: 'Video 1' }, { youtube: 'yAhCQgp-two', thumb: '', title: 'Video 3' } ],
   'home-curtos': [ { youtube: 'bIKyqQmvj1Y', thumb: '', title: 'Video 1' }, { youtube: 'c1bmlTtrYv8', thumb: '', title: 'Video 2' }, { youtube: 'F9GNgwOAREg', thumb: '', title: 'Video 3' } ],
-  longos: ['_F1QO28zyuQ', 'PIPRP-wYqUs', '2fXMITWJsYU', 'yAhCQgp-two', 'uSbEdqzeVwA', '11g5XDk9O2E', 'GNtqgw0BiBM']
+  longos: ['_F1QO28zyuQ', 'PIPRP-wYqUs', '2fXMITWJsYU', 'yAhCQgp-two', 'uSbEdqzeVwA', 'v0AgASAHciE', 'GNtqgw0BiBM']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
   curtos: ['bIKyqQmvj1Y', 'c1bmlTtrYv8', 'F9GNgwOAREg', 'RxvgWMx4kLw', '4lkBaCZFCPo', '55mLGlL2gaQ', 'bfM2NoRcu8U']
     .map((youtube, i) => ({ youtube, thumb: '', title: 'Video ' + (i + 1) })),
@@ -61,7 +61,7 @@ const INFO = {
           desc: 'A video edited for the channel Meu Tech Mundo in Adobe Premiere, with dynamic editing and plenty of B-roll to build the best possible narrative for the comparison.',
           role: 'Video editing' }
   },
-  '11g5XDk9O2E': {
+  'v0AgASAHciE': {
     pt: { title: 'Explorando creepypastas antigas pra ver se elas realmente eram assustadoras',
           desc: 'Trecho do vídeo produzido para o meu canal do YouTube, em que revisito creepypastas antigas (2010–2012) para descobrir se davam mesmo medo ou se era só o nosso cérebro de criança que se assustava fácil demais.',
           role: 'Do roteiro à edição final' },

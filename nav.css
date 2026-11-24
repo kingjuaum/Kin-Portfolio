@@ -1,0 +1,68 @@
+/* ===== v2: camada de navegação (mantém a identidade atual) ===== */
+
+/* Link ativo mais claro no header */
+.nav-left a[aria-current], .nav-right a[aria-current] { font-weight: 700; }
+
+/* Botão voltar ao topo */
+.kv-top {
+  position: fixed; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 60; width: 56px; height: 56px; border-radius: 50%;
+  background: var(--red, #cd0024); color: #fff; border: 3px solid #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,.28); cursor: pointer;
+  display: grid; place-items: center; font: 700 22px/1 Montserrat, sans-serif;
+  opacity: 0; translate: 0 20px; pointer-events: none;
+  transition: opacity .3s, translate .4s cubic-bezier(.2,.9,.3,1.3), transform .2s;
+}
+.kv-top.show { opacity: 1; translate: 0 0; pointer-events: auto; }
+.kv-top:hover { transform: scale(1.08) rotate(-8deg); }
+.kv-top:focus-visible { outline: 3px solid #1d1d1f; outline-offset: 3px; }
+
+/* Bloco "continue assistindo" no fim das páginas internas */
+.kv-next { padding: 72px 0 88px; }
+.kv-next h2 {
+  font-family: Montserrat, sans-serif; font-weight: 700; font-size: clamp(26px, 3.2vw, 38px);
+  margin-bottom: 26px; color: #1d1d1f;
+}
+.kv-next-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+.kv-next a {
+  position: relative; display: flex; align-items: center; gap: 16px;
+  padding: 22px 24px; border-radius: 18px; background: #fff; color: #1d1d1f;
+  border: 3px solid #1d1d1f; box-shadow: 6px 6px 0 var(--red, #cd0024);
+  font: 700 19px Montserrat, sans-serif; text-decoration: none;
+  transition: transform .25s cubic-bezier(.2,.9,.3,1.3), box-shadow .25s;
+}
+.kv-next a:hover, .kv-next a:focus-visible { transform: translate(-3px,-3px); box-shadow: 9px 9px 0 var(--red, #cd0024); }
+.kv-next a img { width: 46px; height: 46px; object-fit: contain; flex: none; }
+.kv-next a small { display: block; font: 400 13px Inter, sans-serif; color: #666; margin-top: 2px; }
+.kv-next a i { margin-left: auto; font-style: normal; color: var(--red, #cd0024); font-size: 22px; transition: translate .25s; }
+.kv-next a:hover i { translate: 5px 0; }
+
+/* Rodapé: mapa do site + contatos com rótulo */
+.kv-foot-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-top: 26px; }
+.kv-foot-nav a { color: #fff; font: 700 15px Montserrat, sans-serif; opacity: .85; padding: 6px 2px; border-bottom: 2px solid transparent; }
+.kv-foot-nav a:hover, .kv-foot-nav a[aria-current] { opacity: 1; border-color: #fff; }
+.kv-copy {
+  margin-top: 14px; background: #fff; color: var(--red, #cd0024); border: 0; border-radius: 999px;
+  padding: 10px 18px; font: 700 14px Montserrat, sans-serif; cursor: pointer; transition: transform .2s;
+}
+.kv-copy:hover { transform: scale(1.05); }
+.kv-copy.ok { background: #1d1d1f; color: #fff; }
+
+/* Atalhos rápidos do hero da home para seções */
+.kv-jump { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.kv-jump a {
+  font: 700 13px Montserrat, sans-serif; color: #1d1d1f; padding: 7px 14px; border-radius: 999px;
+  border: 2px solid #1d1d1f; background: #fff; transition: background .2s, color .2s;
+}
+.kv-jump a:hover { background: #1d1d1f; color: #fff; }
+
+/* Seções âncora não ficam escondidas atrás do header fixo */
+#trabalhos, #sobre, #contatos { scroll-margin-top: 90px; }
+
+@media (max-width: 760px) {
+  .kv-top { width: 50px; height: 50px; }
+  .kv-next { padding: 48px 0 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .kv-top, .kv-next a, .kv-next a i { transition: none; }
+}

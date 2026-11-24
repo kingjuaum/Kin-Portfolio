@@ -828,7 +828,7 @@ p { text-wrap: pretty; }
 .services::before, .services::after, .tools::before, .tools::after { content: ''; position: absolute; top: 0; bottom: 0; width: clamp(40px, 8vw, 120px); z-index: 1; pointer-events: none; }
 .services::before, .tools::before { left: 0; background: linear-gradient(90deg, var(--red), transparent); }
 .services::after, .tools::after { right: 0; background: linear-gradient(-90deg, var(--red), transparent); }
-@media (hover: hover) { .services:hover .marquee-track, .tools:hover .marquee-track { animation-play-state: paused; } }
+
 
 /* Sobre mim: retrato reage ao hover */
 .about .portrait { transition: transform .8s var(--ease), box-shadow .8s var(--ease), opacity 1s var(--ease) var(--rd, 0s), scale 1s var(--ease) var(--rd, 0s); }
